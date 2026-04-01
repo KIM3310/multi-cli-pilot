@@ -24,7 +24,10 @@
     "dist",
     "prompts",
     "workflows",
-    "AGENTS.md"
+    "AGENTS.md",
+    "install.sh",
+    "install.bat",
+    "install.ps1"
   ],
   "scripts": {
     "build": "tsc",
