@@ -1,0 +1,43 @@
+/**
+ * Markdown frontmatter parser for prompt and workflow files.
+ */
+
+import YAML from "yaml";
+
+export interface ParsedMarkdown<T = Record<string, unknown>> {
+  frontmatter: T;
+  body: string;
+}
+
+/**
+ * Parse a markdown file with YAML frontmatter.
+ * Expects the format:
+ * ---
+ * key: value
+ * ---
+ * # Body content
+ */
+export function parseMarkdownWithFrontmatter<T = Record<string, unknown>>(
+  content: string,
+): ParsedMarkdown<T> {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) {
+    return {
+      frontmatter: {} as T,
+      body: content.trim(),
+    };
+  }
+
+  const [, yamlStr, body] = match;
+  let frontmatter: T;
+  try {
+    frontmatter = YAML.parse(yamlStr!) as T;
+  } catch {
+    frontmatter = {} as T;
+  }
+
+  return {
+    frontmatter,
+    body: body!.trim(),
+  };
+}
