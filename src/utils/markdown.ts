@@ -20,7 +20,7 @@ export interface ParsedMarkdown<T = Record<string, unknown>> {
 export function parseMarkdownWithFrontmatter<T = Record<string, unknown>>(
   content: string,
 ): ParsedMarkdown<T> {
-  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     return {
       frontmatter: {} as T,

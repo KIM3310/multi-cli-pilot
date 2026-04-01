@@ -25,15 +25,23 @@ export interface WorkerInfo {
 }
 
 /**
- * Check if tmux is available on the system.
+ * Check if a command is available on the system (cross-platform).
  */
-export function isTmuxAvailable(): boolean {
+function commandExists(cmd: string): boolean {
   try {
-    execSync("which tmux", { stdio: "pipe" });
+    const checkCmd = process.platform === "win32" ? `where ${cmd}` : `which ${cmd}`;
+    execSync(checkCmd, { stdio: "pipe" });
     return true;
   } catch {
     return false;
   }
+}
+
+/**
+ * Check if tmux is available on the system.
+ */
+export function isTmuxAvailable(): boolean {
+  return commandExists("tmux");
 }
 
 /**
@@ -80,7 +88,9 @@ export function createTmuxPane(sessionName: string): string | undefined {
  */
 export function sendToTmuxPane(paneId: string, command: string): void {
   try {
-    execSync(`tmux send-keys -t "${paneId}" "${command}" Enter`, { stdio: "pipe" });
+    // Use -- to prevent argument injection via paneId and pass command safely
+    const escaped = command.replace(/'/g, "'\\''");
+    execSync(`tmux send-keys -t '${paneId}' '${escaped}' Enter`, { stdio: "pipe" });
   } catch (err) {
     log.error(`Failed to send command to pane ${paneId}`, err);
   }

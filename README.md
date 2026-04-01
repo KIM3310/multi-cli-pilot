@@ -57,7 +57,7 @@ gemini-pilot/
     team/            # Team coordinator
     utils/           # Logger, markdown parser, filesystem helpers
     workflows/       # Workflow engine and registry
-  __tests__/         # Test suite (78 tests)
+  __tests__/         # Test suite (94 tests)
 ```
 
 ## Agents

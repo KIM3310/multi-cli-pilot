@@ -3,7 +3,7 @@
  * approval modes, context injection, and recording.
  */
 
-import { execSync, type ExecSyncOptions } from "node:child_process";
+import { execSync, execFileSync, type ExecSyncOptions } from "node:child_process";
 import * as path from "node:path";
 import * as fs from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -193,11 +193,13 @@ export function executePrompt(
   const args = buildGeminiArgs({
     model,
     approvalMode: "auto",
-    prompt: `"${prompt.replace(/"/g, '\\"')}"`,
   });
 
+  // Pass prompt as a separate argument to avoid shell injection
+  args.push(prompt);
+
   try {
-    const result = execSync(`gemini ${args.join(" ")}`, {
+    const result = execFileSync("gemini", args, {
       encoding: "utf-8",
       timeout: 60000,
     });

@@ -74,14 +74,19 @@ export function createMcpServer(projectRoot?: string): McpServer {
       value: z.string().describe("JSON-encoded value to write"),
     },
     async ({ key, value }) => {
-      const parsed = JSON.parse(value);
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(value);
+      } catch (err) {
+        return { content: [{ type: "text" as const, text: `Invalid JSON: ${(err as Error).message}` }] };
+      }
 
       switch (key) {
         case "memory":
-          state.saveMemory(parsed);
+          state.saveMemory(parsed as Parameters<typeof state.saveMemory>[0]);
           break;
         case "notepad":
-          state.saveNotepad(parsed);
+          state.saveNotepad(parsed as Parameters<typeof state.saveNotepad>[0]);
           break;
         default:
           return { content: [{ type: "text" as const, text: `Cannot write to: ${key}` }] };

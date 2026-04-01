@@ -7,7 +7,7 @@
 import * as fs from "node:fs";
 import { execSync } from "node:child_process";
 import { Command } from "commander";
-import { loadConfig, validateConfig } from "../config/index.js";
+import { loadConfig, validateConfig, loadAndValidateConfigFile } from "../config/index.js";
 import { createPromptRegistry } from "../prompts/index.js";
 import { buildAgentRegistry } from "../agents/index.js";
 import { createWorkflowRegistry } from "../workflows/index.js";
@@ -138,6 +138,10 @@ program
   .description("Single-shot query to Gemini")
   .option("--tier <tier>", "Model tier: high, balanced, fast", "fast")
   .action((prompt: string, opts) => {
+    if (!prompt.trim()) {
+      console.error("Error: prompt cannot be empty");
+      process.exit(1);
+    }
     const config = loadConfig();
     const result = executePrompt(config, prompt, opts.tier as ModelTier);
     console.log(result);
@@ -297,7 +301,8 @@ program
     // Check Gemini CLI
     let geminiOk = false;
     try {
-      execSync("which gemini", { stdio: "pipe" });
+      const checkCmd = process.platform === "win32" ? "where gemini" : "which gemini";
+      execSync(checkCmd, { stdio: "pipe" });
       geminiOk = true;
     } catch {
       // Not found
@@ -354,6 +359,15 @@ configCmd
   .command("validate")
   .description("Validate current configuration")
   .action(() => {
+    // First, check the raw config file on disk for JSON/schema errors
+    const fileResult = loadAndValidateConfigFile();
+    if (!fileResult.valid) {
+      console.error("Configuration has errors:");
+      fileResult.errors?.forEach((e) => console.error(`  - ${e}`));
+      process.exit(1);
+    }
+
+    // Then validate the merged runtime config
     const config = loadConfig();
     const result = validateConfig(config);
     if (result.valid) {

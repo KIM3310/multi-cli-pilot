@@ -128,4 +128,76 @@ describe("StateManager", () => {
     expect(memory.decisions[0]!.rationale).toContain("Faster");
     expect(memory.decisions[0]!.date).toBeTruthy();
   });
+
+  it("should list all sessions", () => {
+    const s1 = { id: "s1", startedAt: new Date().toISOString(), tier: "high", approvalMode: "auto", turns: 0, status: "active" as const };
+    const s2 = { id: "s2", startedAt: new Date().toISOString(), tier: "fast", approvalMode: "yolo", turns: 3, status: "completed" as const };
+    stateManager.saveSession(s1);
+    stateManager.saveSession(s2);
+
+    const sessions = stateManager.listSessions();
+    expect(sessions.length).toBe(2);
+  });
+
+  it("should delete a session", () => {
+    const session = { id: "del-me", startedAt: new Date().toISOString(), tier: "fast", approvalMode: "auto", turns: 0, status: "active" as const };
+    stateManager.saveSession(session);
+    expect(stateManager.loadSession("del-me")).toBeDefined();
+
+    stateManager.deleteSession("del-me");
+    expect(stateManager.loadSession("del-me")).toBeUndefined();
+  });
+
+  it("should save and load workflow state", () => {
+    const ws = {
+      workflowName: "autopilot",
+      currentStep: 2,
+      totalSteps: 7,
+      status: "running" as const,
+      iterations: 1,
+      stepResults: [],
+      startedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    stateManager.saveWorkflowState(ws);
+    const loaded = stateManager.loadWorkflowState();
+    expect(loaded).toBeDefined();
+    expect(loaded!.workflowName).toBe("autopilot");
+    expect(loaded!.currentStep).toBe(2);
+  });
+
+  it("should clear workflow state", () => {
+    const ws = {
+      workflowName: "test",
+      currentStep: 0,
+      totalSteps: 3,
+      status: "pending" as const,
+      iterations: 0,
+      stepResults: [],
+      startedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    stateManager.saveWorkflowState(ws);
+    stateManager.clearWorkflowState();
+    expect(stateManager.loadWorkflowState()).toBeUndefined();
+  });
+
+  it("should save and load team state", () => {
+    const ts = {
+      id: "team-1",
+      workerCount: 2,
+      workers: [
+        { id: "w0", role: "executor", status: "idle" as const },
+        { id: "w1", role: "executor", status: "busy" as const, currentTask: "t1" },
+      ],
+      taskQueue: [],
+      phase: "execute" as const,
+      startedAt: new Date().toISOString(),
+    };
+    stateManager.saveTeamState(ts);
+    const loaded = stateManager.loadTeamState();
+    expect(loaded).toBeDefined();
+    expect(loaded!.id).toBe("team-1");
+    expect(loaded!.workers).toHaveLength(2);
+  });
 });

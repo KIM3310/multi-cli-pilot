@@ -76,6 +76,12 @@ describe("Team State Management", () => {
     expect(state.workers[0]!.currentTask).toBeUndefined();
   });
 
+  it("should return unchanged state when completing nonexistent task", () => {
+    const state = initTeamState({ workerCount: 1 });
+    const result = completeTask(state, "nonexistent-id", "result");
+    expect(result).toEqual(state);
+  });
+
   it("should advance phases in order", () => {
     let state = initTeamState({ workerCount: 1 });
     expect(state.phase).toBe("plan");

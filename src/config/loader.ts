@@ -2,6 +2,7 @@
  * Hierarchical config loader: defaults -> user config -> project config -> env vars.
  */
 
+import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import {
@@ -126,4 +127,34 @@ export function validateConfig(
       (i) => `${i.path.join(".")}: ${i.message}`,
     ),
   };
+}
+
+/**
+ * Load and validate the raw project config file from disk.
+ * Unlike loadConfig(), this does NOT silently fall back to defaults --
+ * it reports JSON parse errors and schema violations directly.
+ */
+export function loadAndValidateConfigFile(
+  projectRoot?: string,
+): { valid: boolean; errors?: string[] } {
+  const configPath = getProjectConfigPath(projectRoot);
+  let raw: string;
+  try {
+    raw = fs.readFileSync(configPath, "utf-8");
+  } catch {
+    // No project config file -- that is fine, defaults will be used
+    return { valid: true };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    return {
+      valid: false,
+      errors: [`Invalid JSON in ${configPath}: ${(err as Error).message}`],
+    };
+  }
+
+  return validateConfig(parsed);
 }

@@ -1,11 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as os from "node:os";
 import {
   GeminiPilotConfigSchema,
   DEFAULT_CONFIG,
   ModelTierSchema,
   ApprovalModeSchema,
 } from "../src/config/schema.js";
-import { validateConfig } from "../src/config/loader.js";
+import { validateConfig, loadConfig, loadAndValidateConfigFile } from "../src/config/loader.js";
 
 describe("Config Schema", () => {
   it("should parse default config correctly", () => {
@@ -84,5 +87,53 @@ describe("Config Environment Overrides", () => {
     expect(typeof process.env.GP_MODEL_HIGH).toBe(
       process.env.GP_MODEL_HIGH ? "string" : "undefined",
     );
+  });
+
+  it("should apply GP_MODEL_HIGH env override", () => {
+    process.env.GP_MODEL_HIGH = "custom-high-model";
+    const config = loadConfig();
+    expect(config.models.high).toBe("custom-high-model");
+  });
+});
+
+describe("Config File Validation", () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "gp-cfgtest-"));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it("should report invalid JSON in config file", () => {
+    const stateDir = path.join(tempDir, ".gemini-pilot");
+    fs.mkdirSync(stateDir, { recursive: true });
+    fs.writeFileSync(path.join(stateDir, "config.json"), "{broken");
+
+    const result = loadAndValidateConfigFile(tempDir);
+    expect(result.valid).toBe(false);
+    expect(result.errors![0]).toContain("Invalid JSON");
+  });
+
+  it("should pass for valid config file", () => {
+    const stateDir = path.join(tempDir, ".gemini-pilot");
+    fs.mkdirSync(stateDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(stateDir, "config.json"),
+      JSON.stringify({ models: { high: "test-model" } }),
+    );
+
+    const result = loadAndValidateConfigFile(tempDir);
+    expect(result.valid).toBe(true);
+  });
+
+  it("should pass when no config file exists", () => {
+    const stateDir = path.join(tempDir, ".gemini-pilot");
+    fs.mkdirSync(stateDir, { recursive: true });
+
+    const result = loadAndValidateConfigFile(tempDir);
+    expect(result.valid).toBe(true);
   });
 });

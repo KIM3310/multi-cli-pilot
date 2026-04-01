@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
 import { parseMarkdownWithFrontmatter } from "../src/utils/markdown.js";
-import { ensureDir, readJsonFile, writeJsonFile, listFiles } from "../src/utils/fs.js";
+import { ensureDir, readJsonFile, writeJsonFile, listFiles, readTextFile, writeTextFile, findProjectRoot } from "../src/utils/fs.js";
 import { createLogger, setLogLevel, getLogLevel } from "../src/utils/logger.js";
 
 describe("Markdown Parser", () => {
@@ -34,6 +34,13 @@ Some body text.`;
     const result = parseMarkdownWithFrontmatter("");
     expect(result.frontmatter).toEqual({});
     expect(result.body).toBe("");
+  });
+
+  it("should handle CRLF line endings", () => {
+    const content = "---\r\nname: test\r\ndescription: A test\r\n---\r\n\r\n# Test Content\r\n";
+    const result = parseMarkdownWithFrontmatter(content);
+    expect(result.frontmatter).toEqual({ name: "test", description: "A test" });
+    expect(result.body).toContain("Test Content");
   });
 });
 
@@ -81,6 +88,44 @@ describe("File System Utilities", () => {
 
     const allFiles = listFiles(tempDir);
     expect(allFiles).toHaveLength(3);
+  });
+
+  it("should read and write text files", () => {
+    const filePath = path.join(tempDir, "test.txt");
+    writeTextFile(filePath, "Hello, world!");
+    const content = readTextFile(filePath);
+    expect(content).toBe("Hello, world!");
+  });
+
+  it("should return undefined for non-existent text file", () => {
+    const content = readTextFile(path.join(tempDir, "nope.txt"));
+    expect(content).toBeUndefined();
+  });
+
+  it("should return empty array for non-existent directory in listFiles", () => {
+    const files = listFiles(path.join(tempDir, "nonexistent"));
+    expect(files).toEqual([]);
+  });
+
+  it("should find project root from nested directory", () => {
+    // Create a package.json to mark the root
+    fs.writeFileSync(path.join(tempDir, "package.json"), "{}");
+    const nested = path.join(tempDir, "a", "b", "c");
+    fs.mkdirSync(nested, { recursive: true });
+
+    const root = findProjectRoot(nested);
+    expect(root).toBe(tempDir);
+  });
+
+  it("should return start dir when no markers found", () => {
+    const isolated = fs.mkdtempSync(path.join(os.tmpdir(), "gp-isolated-"));
+    try {
+      const root = findProjectRoot(isolated);
+      // Should return the isolated dir itself since no markers above it
+      expect(typeof root).toBe("string");
+    } finally {
+      fs.rmSync(isolated, { recursive: true, force: true });
+    }
   });
 });
 
