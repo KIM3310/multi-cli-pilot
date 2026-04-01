@@ -18,6 +18,7 @@ Multi-agent orchestration harness for [Gemini CLI](https://github.com/google-gem
 - **Hook System** -- Event-driven hooks for extending harness behavior.
 - **MCP Server** -- Model Context Protocol integration for tool-based workflows.
 - **State Persistence** -- JSON-based state, memory, and notepad stored in `.gemini-pilot/`.
+- **HUD Dashboard** -- Real-time session metrics display with tmux integration support.
 
 ## Installation
 
@@ -117,6 +118,34 @@ gemini-pilot/
 | deploy-prep | Release preparation | Deployment checklists |
 | interview | Ambiguous requirements | Structured clarification |
 | team-sync | Parallel workstreams | Multi-agent coordination |
+
+## HUD (Heads-Up Display)
+
+Real-time session metrics dashboard for your terminal.
+
+```bash
+# One-shot status view (full dashboard with box-drawing)
+gp hud
+
+# Compact single-line output (tmux status bar friendly)
+gp hud --compact
+
+# Live-updating dashboard (refreshes every 2 seconds)
+gp hud --watch
+```
+
+The HUD displays:
+- Current model and tier
+- Session status (idle / running / error)
+- Prompts sent and estimated token usage
+- Elapsed time
+- Active workflow and step progress
+- Team worker count
+
+For tmux integration, add to `.tmux.conf`:
+```
+set -g status-right '#(gp hud --compact 2>/dev/null)'
+```
 
 ## Development
 

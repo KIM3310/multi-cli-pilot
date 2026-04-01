@@ -24,6 +24,7 @@ import {
 import { launchTeam, isTmuxAvailable } from "../team/index.js";
 import { StateManager } from "../state/index.js";
 import { startMcpServer } from "../mcp/index.js";
+import { renderHud, renderHudFull, type HudState } from "../hud/index.js";
 import { findProjectRoot, ensureDir, getStateDir, writeJsonFile, getPackageVersion } from "../utils/fs.js";
 import { setLogLevel } from "../utils/logger.js";
 import { formatError } from "../errors/index.js";
@@ -513,6 +514,55 @@ program
     const result = runBenchmark(config, prompt, opts.dryRun ?? false);
     if (!opts.dryRun) {
       printBenchmarkTable(result);
+    }
+  });
+
+// --- gp hud ---
+program
+  .command("hud")
+  .description("Show real-time session HUD (heads-up display)")
+  .option("--watch", "Refresh every 2 seconds")
+  .option("--compact", "Single-line output (tmux-friendly)")
+  .action((opts) => {
+    const renderOnce = (): void => {
+      const stateManager = new StateManager();
+      const sessions = stateManager.listSessions();
+      const active = sessions.find((s) => s.status === "active");
+      const workflowState = stateManager.loadWorkflowState();
+      const teamState = stateManager.loadTeamState();
+
+      const hudState: HudState = {
+        sessionId: active?.id ?? "none",
+        model: active?.metrics?.modelUsed ?? "n/a",
+        tier: active?.tier ?? "balanced",
+        promptsSent: active?.metrics?.promptsSent ?? 0,
+        estimatedTokens: active?.metrics?.estimatedTokens ?? 0,
+        elapsedMs: active?.metrics?.elapsedMs ?? 0,
+        activeWorkflow: workflowState?.workflowName ?? null,
+        workflowStep: workflowState ? `${workflowState.currentStep + 1}/${workflowState.totalSteps}` : null,
+        teamWorkers: teamState?.workerCount ?? 0,
+        status: active ? "running" : workflowState?.status === "failed" ? "error" : "idle",
+      };
+
+      if (opts.compact) {
+        console.log(renderHud(hudState));
+      } else {
+        console.log(renderHudFull(hudState));
+      }
+    };
+
+    if (opts.watch) {
+      const clear = (): void => {
+        process.stdout.write("\x1b[2J\x1b[H");
+      };
+      clear();
+      renderOnce();
+      setInterval(() => {
+        clear();
+        renderOnce();
+      }, 2000);
+    } else {
+      renderOnce();
     }
   });
 

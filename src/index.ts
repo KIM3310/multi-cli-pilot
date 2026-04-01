@@ -20,3 +20,4 @@ export * from "./errors/index.js";
 export * from "./plugins/index.js";
 export * from "./benchmark/index.js";
 export * from "./init/index.js";
+export * from "./hud/index.js";
