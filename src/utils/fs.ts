@@ -1,5 +1,10 @@
 /**
  * File system utilities for Gemini Pilot.
+ *
+ * Provides safe file I/O helpers with auto-creation of parent directories,
+ * JSON read/write, and project root discovery.
+ *
+ * @module utils/fs
  */
 
 import * as fs from "node:fs";

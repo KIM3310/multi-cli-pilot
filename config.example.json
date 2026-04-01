@@ -1,0 +1,28 @@
+{
+  "_comment": "Gemini Pilot configuration reference. Copy to .gemini-pilot/config.json and customize.",
+
+  "models": {
+    "_comment": "Model identifiers for each quality tier. Override with GP_MODEL_HIGH, GP_MODEL_BALANCED, GP_MODEL_FAST env vars.",
+    "high": "gemini-2.5-pro",
+    "balanced": "gemini-2.5-flash",
+    "fast": "gemini-2.0-flash"
+  },
+
+  "session": {
+    "_comment": "Default session behavior.",
+    "approvalMode": "auto",
+    "defaultTier": "balanced",
+    "contextWindow": 1000000,
+    "maxTurns": 50
+  },
+
+  "team": {
+    "_comment": "Multi-agent team-mode settings (requires tmux).",
+    "maxWorkers": 4,
+    "heartbeatIntervalMs": 5000,
+    "taskTimeoutMs": 300000
+  },
+
+  "promptsDir": null,
+  "workflowsDir": null
+}

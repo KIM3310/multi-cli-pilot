@@ -1,5 +1,11 @@
 /**
  * Prompt file loader and registry.
+ *
+ * Loads markdown files with YAML frontmatter as agent role prompts.
+ * Supports both built-in prompts (shipped with the package) and
+ * custom user prompts (in `.gemini-pilot/prompts/`).
+ *
+ * @module prompts/loader
  */
 
 import * as path from "node:path";

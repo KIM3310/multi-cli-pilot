@@ -1,5 +1,10 @@
 /**
  * Agent registry: resolves agent definitions from prompts and config.
+ *
+ * An "agent" is a named role (e.g. "architect", "executor") that combines
+ * a system prompt, model identifier, quality tier, and reasoning effort.
+ *
+ * @module agents/registry
  */
 
 import { z } from "zod";
@@ -21,7 +26,10 @@ export const AgentDefinitionSchema = z.object({
 export type AgentDefinition = z.infer<typeof AgentDefinitionSchema>;
 
 /**
- * Map a model name to a tier.
+ * Map a Gemini model name to a quality tier.
+ *
+ * @param model - Model identifier string
+ * @returns The inferred model tier
  */
 function modelToTier(model: string): ModelTier {
   if (model.includes("2.5-pro")) return "high";
@@ -30,7 +38,11 @@ function modelToTier(model: string): ModelTier {
 }
 
 /**
- * Resolve an agent definition from a prompt and model config.
+ * Resolve an agent definition from a prompt definition and model config.
+ *
+ * @param prompt - The parsed prompt definition
+ * @param models - Model configuration mapping tiers to identifiers
+ * @returns A fully resolved AgentDefinition
  */
 export function resolveAgent(
   prompt: PromptDefinition,
@@ -55,23 +67,45 @@ export function resolveAgent(
 export class AgentRegistry {
   private agents = new Map<string, AgentDefinition>();
 
+  /**
+   * Register an agent definition.
+   * @param agent - Agent definition to register
+   */
   register(agent: AgentDefinition): void {
     this.agents.set(agent.name, agent);
     log.debug(`Registered agent: ${agent.name} (${agent.model})`);
   }
 
+  /**
+   * Retrieve an agent by name.
+   * @param name - Agent name
+   * @returns The agent definition, or undefined
+   */
   get(name: string): AgentDefinition | undefined {
     return this.agents.get(name);
   }
 
+  /**
+   * List all registered agents.
+   * @returns Array of agent definitions
+   */
   list(): AgentDefinition[] {
     return Array.from(this.agents.values());
   }
 
+  /**
+   * List all registered agent names.
+   * @returns Array of agent name strings
+   */
   names(): string[] {
     return Array.from(this.agents.keys());
   }
 
+  /**
+   * Check if an agent is registered.
+   * @param name - Agent name to check
+   * @returns true if the agent exists
+   */
   has(name: string): boolean {
     return this.agents.has(name);
   }
@@ -83,6 +117,10 @@ export class AgentRegistry {
 
 /**
  * Build an agent registry from a set of prompts and model config.
+ *
+ * @param prompts - Map of prompt name to prompt definition
+ * @param models - Model configuration mapping tiers to identifiers
+ * @returns Populated AgentRegistry
  */
 export function buildAgentRegistry(
   prompts: Map<string, PromptDefinition>,

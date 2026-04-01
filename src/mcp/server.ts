@@ -1,5 +1,8 @@
 /**
- * MCP server: exposes state, memory, and session tools to Gemini CLI.
+ * MCP server: exposes state, memory, and session tools to Gemini CLI
+ * via the Model Context Protocol over stdio.
+ *
+ * @module mcp/server
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -13,6 +16,9 @@ const log = createLogger("mcp");
 
 /**
  * Create and configure the MCP server with all tools.
+ *
+ * @param projectRoot - Optional project root override for state directory resolution
+ * @returns Configured McpServer instance (not yet connected to a transport)
  */
 export function createMcpServer(projectRoot?: string): McpServer {
   const server = new McpServer({
@@ -231,7 +237,9 @@ export function createMcpServer(projectRoot?: string): McpServer {
 }
 
 /**
- * Start the MCP server on stdio.
+ * Start the MCP server on stdio transport.
+ *
+ * @param projectRoot - Optional project root override
  */
 export async function startMcpServer(projectRoot?: string): Promise<void> {
   const server = createMcpServer(projectRoot);

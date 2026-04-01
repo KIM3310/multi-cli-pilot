@@ -1,5 +1,10 @@
 /**
  * Markdown frontmatter parser for prompt and workflow files.
+ *
+ * Splits a markdown document into its YAML frontmatter (between --- delimiters)
+ * and the remaining body content.
+ *
+ * @module utils/markdown
  */
 
 import YAML from "yaml";

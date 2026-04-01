@@ -1,6 +1,8 @@
 /**
  * Session harness: manages Gemini CLI sessions with model routing,
- * approval modes, context injection, and recording.
+ * approval modes, context injection, recording, and metrics tracking.
+ *
+ * @module harness/session
  */
 
 import { execSync, execFileSync, type ExecSyncOptions } from "node:child_process";
@@ -9,29 +11,35 @@ import * as fs from "node:fs";
 import { randomUUID } from "node:crypto";
 import type { GeminiPilotConfig, ModelTier, ApprovalMode } from "../config/schema.js";
 import type { AgentDefinition } from "../agents/registry.js";
-import { StateManager, type SessionState } from "../state/index.js";
+import { StateManager, type SessionState, type SessionMetrics } from "../state/index.js";
 import { createLogger } from "../utils/logger.js";
 import { readTextFile, findProjectRoot } from "../utils/fs.js";
 import { hooks } from "../hooks/index.js";
+import { formatError } from "../errors/index.js";
 
 const log = createLogger("harness");
 
+/** Options for launching a Gemini CLI session. */
 export interface SessionOptions {
+  /** Model quality tier. */
   tier: ModelTier;
+  /** Tool-approval behavior. */
   approvalMode: ApprovalMode;
+  /** Optional agent role to assume. */
   agent?: AgentDefinition;
+  /** Raw AGENTS.md contract text. */
   agentsContract?: string;
+  /** Override project root directory. */
   projectRoot?: string;
-}
-
-export interface SessionMetrics {
-  startTime: number;
-  turns: number;
-  duration: number;
+  /** When true, print what would execute without running Gemini CLI. */
+  dryRun?: boolean;
 }
 
 /**
  * Build the system prompt for a session from available context.
+ *
+ * @param options - Context sources to incorporate
+ * @returns Combined system prompt string
  */
 export function buildSystemPrompt(options: {
   agent?: AgentDefinition;
@@ -62,6 +70,10 @@ export function buildSystemPrompt(options: {
 
 /**
  * Resolve the model identifier for a given tier.
+ *
+ * @param config - Gemini Pilot configuration
+ * @param tier - Desired model quality tier
+ * @returns Model identifier string (e.g. "gemini-2.5-pro")
  */
 export function resolveModel(config: GeminiPilotConfig, tier: ModelTier): string {
   return config.models[tier];
@@ -69,6 +81,9 @@ export function resolveModel(config: GeminiPilotConfig, tier: ModelTier): string
 
 /**
  * Build the Gemini CLI command arguments.
+ *
+ * @param options - Argument building options
+ * @returns Array of CLI argument strings
  */
 export function buildGeminiArgs(options: {
   model: string;
@@ -97,12 +112,62 @@ export function buildGeminiArgs(options: {
 }
 
 /**
+ * Estimate token count from a text string using a rough 4-chars-per-token heuristic.
+ *
+ * @param text - Input text
+ * @returns Estimated token count
+ */
+export function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+/**
+ * Print a dry-run summary of what a session or command would do, without executing.
+ *
+ * @param command - Full command that would be executed
+ * @param model - Selected model identifier
+ * @param tier - Selected tier
+ * @param approvalMode - Approval mode
+ * @param agent - Optional agent name
+ * @param env - Optional environment variable overrides
+ */
+export function printDryRun(options: {
+  command: string;
+  model: string;
+  tier: ModelTier;
+  approvalMode: ApprovalMode;
+  agent?: string;
+  env?: Record<string, string>;
+}): void {
+  console.log("\n  [DRY RUN] The following would be executed:\n");
+  console.log(`  Command:       ${options.command}`);
+  console.log(`  Model:         ${options.model}`);
+  console.log(`  Tier:          ${options.tier}`);
+  console.log(`  Approval Mode: ${options.approvalMode}`);
+  if (options.agent) {
+    console.log(`  Agent:         ${options.agent}`);
+  }
+  if (options.env && Object.keys(options.env).length > 0) {
+    console.log("  Environment:");
+    for (const [k, v] of Object.entries(options.env)) {
+      console.log(`    ${k}=${v}`);
+    }
+  }
+  console.log("\n  No action taken (--dry-run mode).\n");
+}
+
+/**
  * Create a new session and return its state.
+ *
+ * @param config - Gemini Pilot configuration
+ * @param options - Session launch options
+ * @returns The newly created session state
  */
 export function createSession(
   config: GeminiPilotConfig,
   options: SessionOptions,
 ): SessionState {
+  const model = resolveModel(config, options.tier);
   const session: SessionState = {
     id: randomUUID().slice(0, 8),
     startedAt: new Date().toISOString(),
@@ -111,6 +176,12 @@ export function createSession(
     approvalMode: options.approvalMode,
     turns: 0,
     status: "active",
+    metrics: {
+      promptsSent: 0,
+      estimatedTokens: 0,
+      elapsedMs: 0,
+      modelUsed: model,
+    },
   };
 
   const stateManager = new StateManager(options.projectRoot);
@@ -125,6 +196,11 @@ export function createSession(
 
 /**
  * Launch an interactive Gemini CLI session.
+ *
+ * When `options.dryRun` is true the command is printed but not executed.
+ *
+ * @param config - Gemini Pilot configuration
+ * @param options - Session launch options
  */
 export function launchSession(
   config: GeminiPilotConfig,
@@ -150,15 +226,29 @@ export function launchSession(
     projectMemory: memoryText,
   });
 
-  const session = createSession(config, options);
-
   const args = buildGeminiArgs({
     model,
     systemPrompt: systemPrompt || undefined,
     approvalMode: options.approvalMode,
   });
 
-  log.info(`Launching Gemini CLI: gemini ${args.join(" ")}`);
+  const fullCommand = `gemini ${args.join(" ")}`;
+
+  // Dry-run mode: show what would happen and exit
+  if (options.dryRun) {
+    printDryRun({
+      command: fullCommand,
+      model,
+      tier: options.tier,
+      approvalMode: options.approvalMode,
+      agent: options.agent?.name,
+    });
+    return;
+  }
+
+  const session = createSession(config, options);
+
+  log.info(`Launching Gemini CLI: ${fullCommand}`);
   log.info(`Model: ${model} | Agent: ${options.agent?.name ?? "none"}`);
 
   hooks.emit("session-start", {
@@ -168,6 +258,8 @@ export function launchSession(
     approvalMode: options.approvalMode,
   });
 
+  const startTime = Date.now();
+
   try {
     const execOpts: ExecSyncOptions = {
       stdio: "inherit",
@@ -175,11 +267,16 @@ export function launchSession(
       env: { ...process.env },
     };
 
-    execSync(`gemini ${args.join(" ")}`, execOpts);
+    execSync(fullCommand, execOpts);
 
-    // Mark session complete
+    // Update metrics
+    const elapsed = Date.now() - startTime;
     session.status = "completed";
     session.endedAt = new Date().toISOString();
+    session.metrics = {
+      ...session.metrics!,
+      elapsedMs: elapsed,
+    };
     stateManager.saveSession(session);
 
     hooks.emit("session-end", {
@@ -187,8 +284,13 @@ export function launchSession(
       status: "completed",
     });
   } catch (err) {
+    const elapsed = Date.now() - startTime;
     session.status = "error";
     session.endedAt = new Date().toISOString();
+    session.metrics = {
+      ...session.metrics!,
+      elapsedMs: elapsed,
+    };
     stateManager.saveSession(session);
 
     hooks.emit("error", {
@@ -201,12 +303,22 @@ export function launchSession(
 }
 
 /**
- * Execute a single-shot prompt.
+ * Execute a single-shot prompt against Gemini CLI.
+ *
+ * When `dryRun` is true the command is printed and the string
+ * `"[DRY RUN] No output"` is returned.
+ *
+ * @param config - Gemini Pilot configuration
+ * @param prompt - The prompt text
+ * @param tier - Model quality tier
+ * @param dryRun - If true, do not execute
+ * @returns The model response text
  */
 export function executePrompt(
   config: GeminiPilotConfig,
   prompt: string,
   tier: ModelTier = "fast",
+  dryRun = false,
 ): string {
   const model = resolveModel(config, tier);
   const args = buildGeminiArgs({
@@ -214,8 +326,19 @@ export function executePrompt(
     approvalMode: "auto",
   });
 
-  // Pass prompt as a separate argument to avoid shell injection
   args.push(prompt);
+
+  const fullCommand = `gemini ${args.join(" ")}`;
+
+  if (dryRun) {
+    printDryRun({
+      command: fullCommand,
+      model,
+      tier,
+      approvalMode: "auto",
+    });
+    return "[DRY RUN] No output";
+  }
 
   try {
     const result = execFileSync("gemini", args, {
@@ -225,6 +348,6 @@ export function executePrompt(
     return result.trim();
   } catch (err) {
     log.error("Prompt execution failed", err);
-    throw new Error("Failed to execute prompt via Gemini CLI");
+    throw new Error(formatError("GP_030"));
   }
 }

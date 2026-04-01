@@ -1,9 +1,24 @@
 /**
- * State schema definitions.
+ * State schema definitions for sessions, workflows, teams, memory, and notepad.
+ *
+ * All state objects are validated at runtime with Zod schemas.
+ *
+ * @module state/schema
  */
 
 import { z } from "zod";
 
+/** Per-session performance metrics. */
+export const SessionMetricsSchema = z.object({
+  promptsSent: z.number().default(0),
+  estimatedTokens: z.number().default(0),
+  elapsedMs: z.number().default(0),
+  modelUsed: z.string().optional(),
+});
+/** Session metrics type. */
+export type SessionMetrics = z.infer<typeof SessionMetricsSchema>;
+
+/** Persisted state for a single CLI session. */
 export const SessionStateSchema = z.object({
   id: z.string(),
   startedAt: z.string(),
@@ -14,6 +29,7 @@ export const SessionStateSchema = z.object({
   approvalMode: z.string().default("auto"),
   turns: z.number().default(0),
   status: z.enum(["active", "paused", "completed", "error"]).default("active"),
+  metrics: SessionMetricsSchema.optional(),
 });
 export type SessionState = z.infer<typeof SessionStateSchema>;
 

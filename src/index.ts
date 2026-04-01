@@ -3,6 +3,8 @@
  *
  * This is the main library entry point. Import individual modules for
  * programmatic usage.
+ *
+ * @module gemini-pilot
  */
 
 export * from "./config/index.js";
@@ -14,3 +16,7 @@ export * from "./harness/index.js";
 export * from "./team/index.js";
 export * from "./hooks/index.js";
 export * from "./mcp/index.js";
+export * from "./errors/index.js";
+export * from "./plugins/index.js";
+export * from "./benchmark/index.js";
+export * from "./init/index.js";

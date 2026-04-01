@@ -1,5 +1,11 @@
 /**
- * Workflow engine: loads, validates, and drives workflow execution.
+ * Workflow engine: loads, validates, and manages workflow definitions.
+ *
+ * Workflows are multi-step orchestration scripts defined in markdown
+ * with YAML frontmatter. Each step specifies an agent, action, expected
+ * output, gate condition, and optional loop-back target.
+ *
+ * @module workflows/engine
  */
 
 import * as path from "node:path";

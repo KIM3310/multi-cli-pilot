@@ -1,5 +1,9 @@
 /**
  * Simple structured logger for Gemini Pilot.
+ *
+ * Provides scoped, leveled logging with color-coded timestamps.
+ *
+ * @module utils/logger
  */
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
@@ -22,10 +26,18 @@ const RESET = "\x1b[0m";
 
 let currentLevel: LogLevel = "info";
 
+/**
+ * Set the global minimum log level.
+ * @param level - Minimum level to display
+ */
 export function setLogLevel(level: LogLevel): void {
   currentLevel = level;
 }
 
+/**
+ * Get the current global log level.
+ * @returns The current minimum log level
+ */
 export function getLogLevel(): LogLevel {
   return currentLevel;
 }
@@ -41,6 +53,11 @@ function formatMessage(level: LogLevel, scope: string, message: string): string 
   return `${color}${timestamp} [${tag}]${RESET} ${scope ? `(${scope}) ` : ""}${message}`;
 }
 
+/**
+ * Create a scoped logger instance.
+ * @param scope - Logger scope tag (e.g. "harness", "mcp")
+ * @returns Logger object with debug, info, warn, error methods
+ */
 export function createLogger(scope: string) {
   return {
     debug(message: string, ...args: unknown[]): void {

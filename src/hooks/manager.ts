@@ -1,5 +1,10 @@
 /**
  * Event hooks: extensible lifecycle events for session management.
+ *
+ * Provides a simple pub/sub system for lifecycle events like session-start,
+ * session-end, workflow-step, and error.
+ *
+ * @module hooks/manager
  */
 
 import { createLogger } from "../utils/logger.js";

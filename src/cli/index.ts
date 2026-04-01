@@ -2,6 +2,8 @@
 
 /**
  * Gemini Pilot CLI -- Multi-agent orchestration harness for Gemini CLI.
+ *
+ * @module cli
  */
 
 import * as fs from "node:fs";
@@ -11,15 +13,23 @@ import { loadConfig, validateConfig, loadAndValidateConfigFile } from "../config
 import { createPromptRegistry } from "../prompts/index.js";
 import { buildAgentRegistry } from "../agents/index.js";
 import { createWorkflowRegistry } from "../workflows/index.js";
+import { runWorkflow } from "../workflows/runner.js";
 import {
   launchSession,
   executePrompt,
+  printDryRun,
+  resolveModel,
+  buildGeminiArgs,
 } from "../harness/index.js";
 import { launchTeam, isTmuxAvailable } from "../team/index.js";
 import { StateManager } from "../state/index.js";
 import { startMcpServer } from "../mcp/index.js";
 import { findProjectRoot, ensureDir, getStateDir, writeJsonFile, getPackageVersion } from "../utils/fs.js";
 import { setLogLevel } from "../utils/logger.js";
+import { formatError } from "../errors/index.js";
+import { getPluginDirs, ensurePluginDirs } from "../plugins/index.js";
+import { runBenchmark, printBenchmarkTable } from "../benchmark/index.js";
+import { applyTemplate, TEMPLATE_NAMES } from "../init/index.js";
 import type { ModelTier, ApprovalMode } from "../config/schema.js";
 
 const program = new Command();
@@ -45,6 +55,9 @@ program
     ensureDir(stateDir);
     ensureDir(`${stateDir}/sessions`);
 
+    // Ensure plugin directories exist
+    ensurePluginDirs(projectRoot);
+
     // Write default project config if none exists
     const configPath = `${stateDir}/config.json`;
     try {
@@ -68,7 +81,25 @@ program
     console.log("Gemini Pilot initialized successfully!");
     console.log(`  State directory: ${stateDir}`);
     console.log(`  Config: ${configPath}`);
+    console.log(`  Custom prompts: ${getPluginDirs(projectRoot).prompts}`);
+    console.log(`  Custom workflows: ${getPluginDirs(projectRoot).workflows}`);
     console.log("\nRun 'gp doctor' to verify your installation.");
+  });
+
+// --- gp init ---
+program
+  .command("init")
+  .description("Initialize a project with a pre-configured template")
+  .option("--template <name>", `Project template: ${TEMPLATE_NAMES.join(", ")}`)
+  .action((opts) => {
+    if (!opts.template) {
+      console.error(formatError("GP_080", "no template specified"));
+      console.log(`\nAvailable templates: ${TEMPLATE_NAMES.join(", ")}`);
+      console.log("Usage: gp init --template <name>");
+      process.exit(1);
+    }
+    const projectRoot = findProjectRoot();
+    applyTemplate(projectRoot, opts.template);
   });
 
 // --- gp harness ---
@@ -80,6 +111,7 @@ program
   .option("--fast", "Use fast-tier model (gemini-2.0-flash)")
   .option("--agent <name>", "Use a specific agent role")
   .option("--approval-mode <mode>", "Approval mode: full, auto, yolo", "auto")
+  .option("--dry-run", "Show what would be executed without running")
   .action((opts) => {
     const config = loadConfig();
     const tier: ModelTier = opts.high
@@ -99,7 +131,7 @@ program
       );
       agent = agents.get(opts.agent);
       if (!agent) {
-        console.error(`Unknown agent: ${opts.agent}`);
+        console.error(formatError("GP_010", opts.agent));
         console.error(`Available agents: ${agents.names().join(", ")}`);
         process.exit(1);
       }
@@ -109,6 +141,7 @@ program
       tier,
       approvalMode,
       agent,
+      dryRun: opts.dryRun ?? false,
     });
   });
 
@@ -117,13 +150,26 @@ program
   .command("team <count>")
   .description("Launch multi-agent team mode via tmux")
   .option("--role <role>", "Default role for workers", "executor")
+  .option("--dry-run", "Show what would be executed without running")
   .action((count: string, opts) => {
     const config = loadConfig();
     const workerCount = parseInt(count, 10);
 
     if (isNaN(workerCount) || workerCount < 1 || workerCount > 8) {
-      console.error("Worker count must be between 1 and 8");
+      console.error(formatError("GP_041"));
       process.exit(1);
+    }
+
+    if (opts.dryRun) {
+      printDryRun({
+        command: `tmux new-session -d -s gp-team-<id> (with ${workerCount} panes)`,
+        model: resolveModel(config, "balanced"),
+        tier: "balanced",
+        approvalMode: "auto",
+        agent: opts.role,
+        env: { GP_WORKER_COUNT: String(workerCount) },
+      });
+      return;
     }
 
     launchTeam(config, {
@@ -137,13 +183,14 @@ program
   .command("ask <prompt>")
   .description("Single-shot query to Gemini")
   .option("--tier <tier>", "Model tier: high, balanced, fast", "fast")
+  .option("--dry-run", "Show what would be executed without running")
   .action((prompt: string, opts) => {
     if (!prompt.trim()) {
-      console.error("Error: prompt cannot be empty");
+      console.error(formatError("GP_031"));
       process.exit(1);
     }
     const config = loadConfig();
-    const result = executePrompt(config, prompt, opts.tier as ModelTier);
+    const result = executePrompt(config, prompt, opts.tier as ModelTier, opts.dryRun ?? false);
     console.log(result);
   });
 
@@ -154,9 +201,10 @@ const promptsCmd = program
 
 promptsCmd
   .command("list")
-  .description("List all available prompts")
+  .description("List all available prompts (built-in and custom)")
   .action(() => {
-    const registry = createPromptRegistry();
+    const pluginDirs = getPluginDirs();
+    const registry = createPromptRegistry([pluginDirs.prompts]);
     const prompts = registry.list();
 
     if (prompts.length === 0) {
@@ -168,7 +216,8 @@ promptsCmd
     for (const p of prompts) {
       const model = p.frontmatter.model.padEnd(20);
       const effort = p.frontmatter.reasoning_effort;
-      console.log(`  ${p.frontmatter.name.padEnd(20)} ${model} [${effort}]`);
+      const source = p.filePath.includes(".gemini-pilot") ? "[custom]" : "[built-in]";
+      console.log(`  ${p.frontmatter.name.padEnd(20)} ${model} [${effort}] ${source}`);
       console.log(`    ${p.frontmatter.description}\n`);
     }
   });
@@ -177,11 +226,12 @@ promptsCmd
   .command("show <name>")
   .description("Show details of a specific prompt")
   .action((name: string) => {
-    const registry = createPromptRegistry();
+    const pluginDirs = getPluginDirs();
+    const registry = createPromptRegistry([pluginDirs.prompts]);
     const prompt = registry.get(name);
 
     if (!prompt) {
-      console.error(`Prompt not found: ${name}`);
+      console.error(formatError("GP_010", name));
       console.error(`Available: ${registry.names().join(", ")}`);
       process.exit(1);
     }
@@ -201,9 +251,10 @@ const workflowsCmd = program
 
 workflowsCmd
   .command("list")
-  .description("List all available workflows")
+  .description("List all available workflows (built-in and custom)")
   .action(() => {
-    const registry = createWorkflowRegistry();
+    const pluginDirs = getPluginDirs();
+    const registry = createWorkflowRegistry([pluginDirs.workflows]);
     const workflows = registry.list();
 
     if (workflows.length === 0) {
@@ -215,7 +266,8 @@ workflowsCmd
     for (const w of workflows) {
       const steps = w.steps.length;
       const policy = w.frontmatter.execution_policy;
-      console.log(`  ${w.frontmatter.name.padEnd(18)} ${steps} steps  [max_iter=${policy.max_iterations}]`);
+      const source = w.filePath.includes(".gemini-pilot") ? "[custom]" : "[built-in]";
+      console.log(`  ${w.frontmatter.name.padEnd(18)} ${steps} steps  [max_iter=${policy.max_iterations}] ${source}`);
       console.log(`    ${w.frontmatter.description}`);
       if (w.frontmatter.triggers.length > 0) {
         console.log(`    Triggers: ${w.frontmatter.triggers.join(", ")}`);
@@ -228,11 +280,12 @@ workflowsCmd
   .command("show <name>")
   .description("Show details of a specific workflow")
   .action((name: string) => {
-    const registry = createWorkflowRegistry();
+    const pluginDirs = getPluginDirs();
+    const registry = createWorkflowRegistry([pluginDirs.workflows]);
     const workflow = registry.get(name);
 
     if (!workflow) {
-      console.error(`Workflow not found: ${name}`);
+      console.error(formatError("GP_020", name));
       console.error(`Available: ${registry.names().join(", ")}`);
       process.exit(1);
     }
@@ -256,31 +309,21 @@ workflowsCmd
 
 workflowsCmd
   .command("run <name>")
-  .description("Run a workflow")
-  .action((name: string) => {
-    const registry = createWorkflowRegistry();
+  .description("Run a workflow by executing each step sequentially")
+  .option("--dry-run", "Show what would be executed without running")
+  .action((name: string, opts) => {
+    const config = loadConfig();
+    const pluginDirs = getPluginDirs();
+    const registry = createWorkflowRegistry([pluginDirs.workflows]);
     const workflow = registry.get(name);
 
     if (!workflow) {
-      console.error(`Workflow not found: ${name}`);
+      console.error(formatError("GP_020", name));
       console.error(`Available: ${registry.names().join(", ")}`);
       process.exit(1);
     }
 
-    console.log(`\nWorkflow: ${workflow.frontmatter.name}`);
-    console.log(`Description: ${workflow.frontmatter.description}`);
-    console.log(`Steps: ${workflow.steps.length}`);
-    console.log(`\nExecution would run the following steps:\n`);
-    workflow.steps.forEach((step, i) => {
-      console.log(`  ${i + 1}. [${step.agent}] ${step.action}`);
-      console.log(`     Gate: ${step.gate}`);
-      if (step.loop_to !== undefined) {
-        console.log(`     Loop to step ${step.loop_to} if needed`);
-      }
-    });
-    console.log(
-      "\nNote: Full workflow execution requires an active Gemini CLI session.",
-    );
+    runWorkflow(config, workflow, { dryRun: opts.dryRun ?? false });
   });
 
 // --- gp doctor ---
@@ -297,6 +340,9 @@ program
     console.log(
       `  ${nodeOk ? "OK" : "FAIL"}  Node.js ${nodeVersion} ${nodeOk ? "" : "(>= 20 required)"}`,
     );
+    if (!nodeOk) {
+      console.log(`         ${formatError("GP_004")}`);
+    }
 
     // Check Gemini CLI
     let geminiOk = false;
@@ -308,8 +354,11 @@ program
       // Not found
     }
     console.log(
-      `  ${geminiOk ? "OK" : "WARN"}  Gemini CLI ${geminiOk ? "found" : "not found (install: npm i -g @google/gemini-cli)"}`,
+      `  ${geminiOk ? "OK" : "WARN"}  Gemini CLI ${geminiOk ? "found" : "not found"}`,
     );
+    if (!geminiOk) {
+      console.log(`         ${formatError("GP_005")}`);
+    }
 
     // Check tmux
     const tmuxOk = isTmuxAvailable();
@@ -331,13 +380,18 @@ program
       `  ${configResult.valid ? "OK" : "WARN"}  Configuration ${configResult.valid ? "valid" : "has issues"}`,
     );
 
-    // Check prompts
-    const prompts = createPromptRegistry();
-    console.log(`  OK  Prompts: ${prompts.size} loaded`);
+    // Check prompts (including plugins)
+    const pluginDirs = getPluginDirs();
+    const prompts = createPromptRegistry([pluginDirs.prompts]);
+    const builtinCount = createPromptRegistry().size;
+    const customCount = prompts.size - builtinCount;
+    console.log(`  OK  Prompts: ${prompts.size} loaded (${builtinCount} built-in, ${customCount} custom)`);
 
-    // Check workflows
-    const workflows = createWorkflowRegistry();
-    console.log(`  OK  Workflows: ${workflows.size} loaded`);
+    // Check workflows (including plugins)
+    const workflows = createWorkflowRegistry([pluginDirs.workflows]);
+    const builtinWfCount = createWorkflowRegistry().size;
+    const customWfCount = workflows.size - builtinWfCount;
+    console.log(`  OK  Workflows: ${workflows.size} loaded (${builtinWfCount} built-in, ${customWfCount} custom)`);
 
     console.log();
   });
@@ -362,7 +416,7 @@ configCmd
     // First, check the raw config file on disk for JSON/schema errors
     const fileResult = loadAndValidateConfigFile();
     if (!fileResult.valid) {
-      console.error("Configuration has errors:");
+      console.error(formatError("GP_001"));
       fileResult.errors?.forEach((e) => console.error(`  - ${e}`));
       process.exit(1);
     }
@@ -373,7 +427,7 @@ configCmd
     if (result.valid) {
       console.log("Configuration is valid.");
     } else {
-      console.error("Configuration has errors:");
+      console.error(formatError("GP_002"));
       result.errors?.forEach((e) => console.error(`  - ${e}`));
       process.exit(1);
     }
@@ -382,7 +436,7 @@ configCmd
 // --- gp status ---
 program
   .command("status")
-  .description("Show active sessions and current state")
+  .description("Show active sessions, metrics, and current state")
   .action(() => {
     const stateManager = new StateManager();
     const sessions = stateManager.listSessions();
@@ -398,14 +452,37 @@ program
         console.log(
           `    ${s.id}  agent=${s.agent ?? "none"}  tier=${s.tier}  started=${s.startedAt}`,
         );
+        if (s.metrics) {
+          const m = s.metrics;
+          console.log(
+            `           prompts=${m.promptsSent}  tokens~${m.estimatedTokens}  elapsed=${m.elapsedMs}ms  model=${m.modelUsed ?? "unknown"}`,
+          );
+        }
       }
     } else {
       console.log("  No active sessions.");
     }
 
+    // Show recent completed sessions with metrics
+    const recentCompleted = sessions
+      .filter((s) => s.status === "completed" && s.metrics)
+      .slice(-3);
+    if (recentCompleted.length > 0) {
+      console.log(`\n  Recent Sessions (last ${recentCompleted.length}):`);
+      for (const s of recentCompleted) {
+        const m = s.metrics!;
+        console.log(
+          `    ${s.id}  status=${s.status}  model=${m.modelUsed ?? "unknown"}  elapsed=${m.elapsedMs}ms  prompts=${m.promptsSent}`,
+        );
+      }
+    }
+
     if (workflowState) {
       console.log(
         `\n  Active Workflow: ${workflowState.workflowName} (step ${workflowState.currentStep + 1}/${workflowState.totalSteps})`,
+      );
+      console.log(
+        `    Status: ${workflowState.status} | Iterations: ${workflowState.iterations}`,
       );
     }
 
@@ -420,6 +497,23 @@ program
       `\n  Total Sessions: ${sessions.length}`,
     );
     console.log();
+  });
+
+// --- gp benchmark ---
+program
+  .command("benchmark <prompt>")
+  .description("Run the same prompt across all model tiers and compare response time")
+  .option("--dry-run", "Show what would be executed without running")
+  .action((prompt: string, opts) => {
+    if (!prompt.trim()) {
+      console.error(formatError("GP_031"));
+      process.exit(1);
+    }
+    const config = loadConfig();
+    const result = runBenchmark(config, prompt, opts.dryRun ?? false);
+    if (!opts.dryRun) {
+      printBenchmarkTable(result);
+    }
   });
 
 // --- gp mcp ---

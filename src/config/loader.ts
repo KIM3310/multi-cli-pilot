@@ -1,5 +1,13 @@
 /**
  * Hierarchical config loader: defaults -> user config -> project config -> env vars.
+ *
+ * Loading priority (later layers win):
+ *   1. Built-in defaults (see schema.ts)
+ *   2. User-level config (`~/.config/gemini-pilot/config.json`)
+ *   3. Project-level config (`.gemini-pilot/config.json`)
+ *   4. Environment variables (`GP_MODEL_HIGH`, etc.)
+ *
+ * @module config/loader
  */
 
 import * as fs from "node:fs";

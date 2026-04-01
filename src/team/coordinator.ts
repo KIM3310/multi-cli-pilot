@@ -1,5 +1,10 @@
 /**
  * Team coordinator: manages multi-agent parallel execution via tmux.
+ *
+ * Provides tmux session management, worker pane creation, task queuing,
+ * and phase-based orchestration for team mode.
+ *
+ * @module team/coordinator
  */
 
 import { execSync, spawn, type ChildProcess } from "node:child_process";
