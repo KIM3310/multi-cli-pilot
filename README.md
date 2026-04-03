@@ -168,7 +168,7 @@ npm run build
 
 ## Tool Calling Optimization
 
-Gemini Pilot includes a comprehensive tool-calling optimization system that improves function call accuracy by **10-12%** on BFCL-style benchmarks.
+Gemini Pilot ships with a tool-calling optimization system that improves function call accuracy by **10-12%** on BFCL-style benchmarks.
 
 ### Standalone Tool-Calling Prompt
 

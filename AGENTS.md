@@ -40,7 +40,7 @@ Workflows activate based on task characteristics:
 - **deep-plan**: When the task requires strategic thinking across multiple components or phases
 - **sprint**: When there is a focused, time-boxed objective with clear deliverables
 - **investigate**: When the root cause is unknown and systematic evidence gathering is needed
-- **tdd**: When building new functionality where correctness is paramount
+- **tdd**: When building new functionality where correctness matters most
 - **review-cycle**: When code changes need thorough quality assessment before merge
 - **refactor**: When improving existing code structure without changing behavior
 - **deploy-prep**: When preparing a release with verification checklists
