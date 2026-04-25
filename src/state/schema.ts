@@ -37,7 +37,9 @@ export const WorkflowStateSchema = z.object({
   workflowName: z.string(),
   currentStep: z.number().default(0),
   totalSteps: z.number(),
-  status: z.enum(["pending", "running", "paused", "completed", "failed"]).default("pending"),
+  status: z
+    .enum(["pending", "running", "paused", "completed", "failed"])
+    .default("pending"),
   iterations: z.number().default(0),
   stepResults: z.array(z.record(z.unknown())).default([]),
   startedAt: z.string(),
@@ -75,23 +77,27 @@ export const ProjectMemorySchema = z.object({
   techStack: z.array(z.string()).default([]),
   conventions: z.array(z.string()).default([]),
   notes: z.array(z.string()).default([]),
-  decisions: z.array(
-    z.object({
-      date: z.string(),
-      decision: z.string(),
-      rationale: z.string(),
-    }),
-  ).default([]),
+  decisions: z
+    .array(
+      z.object({
+        date: z.string(),
+        decision: z.string(),
+        rationale: z.string(),
+      }),
+    )
+    .default([]),
 });
 export type ProjectMemory = z.infer<typeof ProjectMemorySchema>;
 
 export const NotepadSchema = z.object({
-  entries: z.array(
-    z.object({
-      timestamp: z.string(),
-      content: z.string(),
-      tags: z.array(z.string()).default([]),
-    }),
-  ).default([]),
+  entries: z
+    .array(
+      z.object({
+        timestamp: z.string(),
+        content: z.string(),
+        tags: z.array(z.string()).default([]),
+      }),
+    )
+    .default([]),
 });
 export type Notepad = z.infer<typeof NotepadSchema>;

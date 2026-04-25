@@ -8,8 +8,19 @@
  * @module tool-reliability/middleware
  */
 
-import { parseToolCalls, type ToolCall, type ToolDefinition, type ParseResult } from "./parser.js";
-import { parseWithRetry, createMetricsTracker, type ModelCaller, type RetryMetrics, type RetryAggregateMetrics } from "./retry.js";
+import {
+  type ParseResult,
+  parseToolCalls,
+  type ToolCall,
+  type ToolDefinition,
+} from "./parser.js";
+import {
+  createMetricsTracker,
+  type ModelCaller,
+  parseWithRetry,
+  type RetryAggregateMetrics,
+  type RetryMetrics,
+} from "./retry.js";
 
 /** Configuration for the tool reliability middleware. */
 export interface ToolReliabilityConfig {
@@ -67,7 +78,12 @@ export async function executeWithToolReliability(
     const msg = err instanceof Error ? err.message : String(err);
     return {
       calls: [],
-      parseResult: { calls: [], errors: [`Model call failed: ${msg}`], coercions: [], format: "unknown" },
+      parseResult: {
+        calls: [],
+        errors: [`Model call failed: ${msg}`],
+        coercions: [],
+        format: "unknown",
+      },
       middlewareApplied: true,
     };
   }
@@ -117,7 +133,9 @@ export async function executeWithToolReliability(
 /**
  * Create a standalone tool reliability middleware instance that tracks aggregate metrics.
  */
-export function createToolReliabilityMiddleware(config: ToolReliabilityConfig = DEFAULT_TOOL_RELIABILITY_CONFIG) {
+export function createToolReliabilityMiddleware(
+  config: ToolReliabilityConfig = DEFAULT_TOOL_RELIABILITY_CONFIG,
+) {
   const tracker = createMetricsTracker();
 
   return {
@@ -129,7 +147,12 @@ export function createToolReliabilityMiddleware(config: ToolReliabilityConfig = 
       tools: ToolDefinition[],
       callModel: ModelCaller,
     ): Promise<ToolCallResult> {
-      const result = await executeWithToolReliability(prompt, tools, callModel, config);
+      const result = await executeWithToolReliability(
+        prompt,
+        tools,
+        callModel,
+        config,
+      );
       if (result.retryMetrics) {
         tracker.record(result.retryMetrics);
       }

@@ -36,7 +36,7 @@ export function readJsonFile<T>(filePath: string): T | undefined {
  */
 export function writeJsonFile(filePath: string, data: unknown): void {
   ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf-8");
+  fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf-8");
 }
 
 /**

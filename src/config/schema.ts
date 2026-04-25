@@ -81,4 +81,5 @@ export const GeminiPilotConfigSchema = MultiCliPilotConfigSchema;
 export type GeminiPilotConfig = MultiCliPilotConfig;
 
 /** Default configuration with all fields set to their schema defaults. */
-export const DEFAULT_CONFIG: MultiCliPilotConfig = MultiCliPilotConfigSchema.parse({});
+export const DEFAULT_CONFIG: MultiCliPilotConfig =
+  MultiCliPilotConfigSchema.parse({});

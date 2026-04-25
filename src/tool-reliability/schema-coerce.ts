@@ -13,7 +13,18 @@
  * @module tool-reliability/schema-coerce
  */
 
-import { type ZodTypeAny, ZodObject, ZodArray, ZodNumber, ZodBoolean, ZodString, ZodOptional, ZodDefault, ZodEnum, ZodNullable } from "zod";
+import {
+  ZodArray,
+  ZodBoolean,
+  ZodDefault,
+  ZodEnum,
+  ZodNullable,
+  ZodNumber,
+  ZodObject,
+  ZodOptional,
+  ZodString,
+  type ZodTypeAny,
+} from "zod";
 
 /** Maximum recursion depth for nested coercion. */
 const MAX_DEPTH = 20;
@@ -149,7 +160,12 @@ export function coerceToSchema(
   }
 
   // Object coercion: key normalization + field coercion + strip unknown
-  if (innerSchema instanceof ZodObject && typeof value === "object" && value !== null && !Array.isArray(value)) {
+  if (
+    innerSchema instanceof ZodObject &&
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value)
+  ) {
     const shape = innerSchema.shape as Record<string, ZodTypeAny>;
     const schemaKeys = Object.keys(shape);
     const inputObj = value as Record<string, unknown>;
@@ -174,12 +190,17 @@ export function coerceToSchema(
         schemaKeyMap.get(camelToSnake(inputKey)) ??
         schemaKeyMap.get(inputKey.toLowerCase());
 
-      if (schemaKey && shape[schemaKey]) {
+      const schemaValue = schemaKey ? shape[schemaKey] : undefined;
+      if (schemaKey && schemaValue) {
         if (inputKey !== schemaKey) {
           actions.push(`key rename: "${inputKey}" -> "${schemaKey}"`);
           anyCoerced = true;
         }
-        const inner = coerceToSchema(shape[schemaKey]!, inputObj[inputKey], depth + 1);
+        const inner = coerceToSchema(
+          schemaValue,
+          inputObj[inputKey],
+          depth + 1,
+        );
         result[schemaKey] = inner.value;
         if (inner.coerced) anyCoerced = true;
         actions.push(...inner.actions);

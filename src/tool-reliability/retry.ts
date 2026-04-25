@@ -11,7 +11,12 @@
  * @module tool-reliability/retry
  */
 
-import { parseToolCalls, type ToolCall, type ToolDefinition, type ParseResult } from "./parser.js";
+import {
+  type ParseResult,
+  parseToolCalls,
+  type ToolCall,
+  type ToolDefinition,
+} from "./parser.js";
 
 /** Retry configuration. */
 export interface RetryConfig {
@@ -71,10 +76,7 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
  * Calculate exponential backoff delay with jitter.
  */
 function calculateDelay(attempt: number, config: RetryConfig): number {
-  const delay = Math.min(
-    config.baseDelayMs * Math.pow(2, attempt),
-    config.maxDelayMs,
-  );
+  const delay = Math.min(config.baseDelayMs * 2 ** attempt, config.maxDelayMs);
   // Add 0-25% jitter
   const jitter = delay * 0.25 * Math.random();
   return delay + jitter;
@@ -144,7 +146,11 @@ export async function parseWithRetry(
     const delay = calculateDelay(attempt - 1, config);
     await sleep(delay);
 
-    const retryPrompt = buildRetryPrompt(originalPrompt, parseResult.errors, attempt);
+    const retryPrompt = buildRetryPrompt(
+      originalPrompt,
+      parseResult.errors,
+      attempt,
+    );
 
     metrics.totalAttempts++;
     let newOutput: string;
@@ -193,7 +199,8 @@ export function createMetricsTracker(): {
         totalInvocations,
         successfulInvocations,
         totalRetries,
-        successRate: totalInvocations > 0 ? successfulInvocations / totalInvocations : 0,
+        successRate:
+          totalInvocations > 0 ? successfulInvocations / totalInvocations : 0,
       };
     },
   };

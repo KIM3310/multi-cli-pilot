@@ -93,7 +93,10 @@ export class MetricsTracker {
     const elapsed = (m.elapsedMs / 1000).toFixed(1);
     const avgLatency =
       m.latencySamples.length > 0
-        ? (m.latencySamples.reduce((a, b) => a + b, 0) / m.latencySamples.length).toFixed(0)
+        ? (
+            m.latencySamples.reduce((a, b) => a + b, 0) /
+            m.latencySamples.length
+          ).toFixed(0)
         : "n/a";
     return [
       `  Prompts sent:     ${m.promptsSent}`,

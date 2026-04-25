@@ -80,10 +80,11 @@ function stripComments(src: string): string {
  */
 function stripCodeFences(src: string): string {
   const trimmed = src.trim();
-  const fencePattern = /^```(?:json|JSON|javascript|js)?\s*\n?([\s\S]*?)\n?\s*```$/;
+  const fencePattern =
+    /^```(?:json|JSON|javascript|js)?\s*\n?([\s\S]*?)\n?\s*```$/;
   const match = fencePattern.exec(trimmed);
   if (match) {
-    return match[1]!;
+    return match[1] ?? "";
   }
   return trimmed;
 }
@@ -125,7 +126,7 @@ function extractJsonFromText(src: string): string {
   let inString = false;
   let stringChar = "";
   for (let i = startIdx; i < src.length; i++) {
-    const ch = src[i]!;
+    const ch = src[i] ?? "";
     if (inString) {
       if (ch === "\\" && i + 1 < src.length) {
         i++; // skip escaped
@@ -163,7 +164,7 @@ function fixTrailingCommas(src: string): string {
   let inString = false;
   let stringChar = "";
   for (let i = 0; i < src.length; i++) {
-    const ch = src[i]!;
+    const ch = src[i] ?? "";
     if (inString) {
       out += ch;
       if (ch === "\\" && i + 1 < src.length) {
@@ -183,7 +184,7 @@ function fixTrailingCommas(src: string): string {
     if (ch === ",") {
       // Look ahead past whitespace for } or ] or another comma
       let j = i + 1;
-      while (j < src.length && /\s/.test(src[j]!)) j++;
+      while (j < src.length && /\s/.test(src[j] ?? "")) j++;
       const next = src[j];
       if (next === "}" || next === "]" || next === ",") {
         // Skip this comma (trailing or double comma)
@@ -204,7 +205,7 @@ function normalizeSyntax(src: string): string {
   let i = 0;
 
   while (i < src.length) {
-    const ch = src[i]!;
+    const ch = src[i] ?? "";
 
     // Double-quoted string -- pass through
     if (ch === '"') {
@@ -252,17 +253,14 @@ function normalizeSyntax(src: string): string {
       // (after { or , with optional whitespace)
       const preceding = out.trimEnd();
       const lastSignificant = preceding[preceding.length - 1];
-      if (
-        lastSignificant === "{" ||
-        lastSignificant === ","
-      ) {
+      if (lastSignificant === "{" || lastSignificant === ",") {
         let key = "";
-        while (i < src.length && isIdentPart(src[i]!)) {
+        while (i < src.length && isIdentPart(src[i] ?? "")) {
           key += src[i];
           i++;
         }
         // Skip whitespace to check for colon
-        while (i < src.length && /\s/.test(src[i]!)) i++;
+        while (i < src.length && /\s/.test(src[i] ?? "")) i++;
         if (src[i] === ":") {
           out += `"${key}"`;
           continue;
@@ -296,7 +294,7 @@ function autoClose(src: string): string {
   let inString = false;
   let stringChar = "";
   for (let i = 0; i < src.length; i++) {
-    const ch = src[i]!;
+    const ch = src[i] ?? "";
     if (inString) {
       if (ch === "\\" && i + 1 < src.length) {
         i++;
@@ -343,7 +341,7 @@ function autoClose(src: string): string {
  * 5. Try JSON.parse on the cleaned output.
  */
 export function rjsonParse(input: string): RJsonResult {
-  if (!input || !input.trim()) {
+  if (!input?.trim()) {
     return { value: undefined, ok: false, error: "Empty input" };
   }
 

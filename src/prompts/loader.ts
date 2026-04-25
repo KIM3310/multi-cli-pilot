@@ -8,11 +8,11 @@
  * @module prompts/loader
  */
 
-import * as path from "node:path";
 import * as fs from "node:fs";
+import * as path from "node:path";
 import { z } from "zod";
-import { parseMarkdownWithFrontmatter } from "../utils/markdown.js";
 import { createLogger } from "../utils/logger.js";
+import { parseMarkdownWithFrontmatter } from "../utils/markdown.js";
 
 const log = createLogger("prompts");
 
@@ -53,7 +53,9 @@ export function loadPromptFile(filePath: string): PromptDefinition | undefined {
 /**
  * Load all prompts from a directory.
  */
-export function loadPromptsFromDir(dirPath: string): Map<string, PromptDefinition> {
+export function loadPromptsFromDir(
+  dirPath: string,
+): Map<string, PromptDefinition> {
   const prompts = new Map<string, PromptDefinition>();
 
   if (!fs.existsSync(dirPath)) {

@@ -46,7 +46,11 @@ function shouldLog(level: LogLevel): boolean {
   return LEVEL_ORDER[level] >= LEVEL_ORDER[currentLevel];
 }
 
-function formatMessage(level: LogLevel, scope: string, message: string): string {
+function formatMessage(
+  level: LogLevel,
+  scope: string,
+  message: string,
+): string {
   const timestamp = new Date().toISOString().slice(11, 23);
   const color = LEVEL_COLORS[level];
   const tag = level.toUpperCase().padEnd(5);

@@ -13,7 +13,7 @@
 
 import type { ZodTypeAny } from "zod";
 import { rjsonParse } from "./rjson.js";
-import { coerceToSchema, type CoerceResult } from "./schema-coerce.js";
+import { type CoerceResult, coerceToSchema } from "./schema-coerce.js";
 
 /** A parsed tool call. */
 export interface ToolCall {
@@ -54,7 +54,7 @@ export function parseToolCalls(
     format: "unknown",
   };
 
-  if (!text || !text.trim()) {
+  if (!text?.trim()) {
     result.errors.push("Empty input text");
     return result;
   }
@@ -103,28 +103,34 @@ export function parseToolCalls(
  */
 function extractXmlToolCalls(text: string): ToolCall[] {
   const calls: ToolCall[] = [];
-  const xmlPattern = /<(?:tool_call|function_call)\s*>([\s\S]*?)<\/(?:tool_call|function_call)>/g;
+  const xmlPattern =
+    /<(?:tool_call|function_call)\s*>([\s\S]*?)<\/(?:tool_call|function_call)>/g;
 
-  let match: RegExpExecArray | null;
-  while ((match = xmlPattern.exec(text)) !== null) {
-    const inner = match[1]!;
+  let match = xmlPattern.exec(text);
+  while (match !== null) {
+    const inner = match[1] ?? "";
     const nameMatch = /<name\s*>([\s\S]*?)<\/name>/.exec(inner);
     const argsMatch = /<arguments?\s*>([\s\S]*?)<\/arguments?>/.exec(inner);
 
     if (nameMatch) {
-      const name = nameMatch[1]!.trim();
+      const name = nameMatch[1]?.trim();
       let args: Record<string, unknown> = {};
 
       if (argsMatch) {
-        const argsText = argsMatch[1]!.trim();
+        const argsText = argsMatch[1]?.trim();
         const parsed = rjsonParse(argsText);
-        if (parsed.ok && typeof parsed.value === "object" && parsed.value !== null) {
+        if (
+          parsed.ok &&
+          typeof parsed.value === "object" &&
+          parsed.value !== null
+        ) {
           args = parsed.value as Record<string, unknown>;
         }
       }
 
       calls.push({ name, arguments: args });
     }
+    match = xmlPattern.exec(text);
   }
 
   return calls;
@@ -137,14 +143,15 @@ function extractMarkdownToolCalls(text: string): ToolCall[] {
   const calls: ToolCall[] = [];
   const mdPattern = /```(?:json|JSON|javascript|js)?\s*\n([\s\S]*?)\n\s*```/g;
 
-  let match: RegExpExecArray | null;
-  while ((match = mdPattern.exec(text)) !== null) {
-    const content = match[1]!.trim();
+  let match = mdPattern.exec(text);
+  while (match !== null) {
+    const content = match[1]?.trim();
     const parsed = rjsonParse(content);
     if (parsed.ok) {
       const extracted = extractCallsFromValue(parsed.value);
       calls.push(...extracted);
     }
+    match = mdPattern.exec(text);
   }
 
   return calls;
@@ -196,7 +203,12 @@ function extractCallsFromValue(value: unknown): ToolCall[] {
         typeof fn.arguments === "object" && fn.arguments !== null
           ? (fn.arguments as Record<string, unknown>)
           : typeof fn.arguments === "string"
-            ? (() => { const p = rjsonParse(fn.arguments as string); return p.ok && typeof p.value === "object" ? p.value as Record<string, unknown> : {}; })()
+            ? (() => {
+                const p = rjsonParse(fn.arguments as string);
+                return p.ok && typeof p.value === "object"
+                  ? (p.value as Record<string, unknown>)
+                  : {};
+              })()
             : {};
       return [{ name: fn.name, arguments: args }];
     }
@@ -229,14 +241,21 @@ function validateAndCoerce(
   const toolDef = tools.find((t) => t.name === call.name);
   if (!toolDef) {
     // Try case-insensitive match
-    const ciMatch = tools.find((t) => t.name.toLowerCase() === call.name.toLowerCase());
+    const ciMatch = tools.find(
+      (t) => t.name.toLowerCase() === call.name.toLowerCase(),
+    );
     if (ciMatch) {
-      result.coercions.push(`tool name case fix: "${call.name}" -> "${ciMatch.name}"`);
+      result.coercions.push(
+        `tool name case fix: "${call.name}" -> "${ciMatch.name}"`,
+      );
       call = { ...call, name: ciMatch.name };
       const coerced = coerceToSchema(ciMatch.parameters, call.arguments);
       if (coerced.coerced) {
         result.coercions.push(...coerced.actions);
-        return { name: call.name, arguments: coerced.value as Record<string, unknown> };
+        return {
+          name: call.name,
+          arguments: coerced.value as Record<string, unknown>,
+        };
       }
       return call;
     }
@@ -245,10 +264,16 @@ function validateAndCoerce(
   }
 
   // Apply schema coercion
-  const coerced: CoerceResult = coerceToSchema(toolDef.parameters, call.arguments);
+  const coerced: CoerceResult = coerceToSchema(
+    toolDef.parameters,
+    call.arguments,
+  );
   if (coerced.coerced) {
     result.coercions.push(...coerced.actions);
-    return { name: call.name, arguments: coerced.value as Record<string, unknown> };
+    return {
+      name: call.name,
+      arguments: coerced.value as Record<string, unknown>,
+    };
   }
 
   return call;

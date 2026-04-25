@@ -10,12 +10,18 @@
  */
 
 import type { GeminiPilotConfig } from "../config/schema.js";
-import type { WorkflowDefinition, WorkflowStep } from "./engine.js";
-import { executePrompt, resolveModel, printDryRun, buildGeminiArgs, ensureGeminiInstalled } from "../harness/session.js";
+import { formatError } from "../errors/index.js";
+import {
+  buildGeminiArgs,
+  ensureGeminiInstalled,
+  executePrompt,
+  printDryRun,
+  resolveModel,
+} from "../harness/session.js";
+import { hooks } from "../hooks/index.js";
 import { StateManager, type WorkflowState } from "../state/index.js";
 import { createLogger } from "../utils/logger.js";
-import { formatError } from "../errors/index.js";
-import { hooks } from "../hooks/index.js";
+import type { WorkflowDefinition, WorkflowStep } from "./engine.js";
 
 const log = createLogger("workflow-runner");
 
@@ -92,7 +98,10 @@ export function evaluateGate(gate: string, output: string): boolean {
  * @param priorOutput - Output from the previous step (if any)
  * @returns Assembled prompt string
  */
-export function buildStepPrompt(step: WorkflowStep, priorOutput?: string): string {
+export function buildStepPrompt(
+  step: WorkflowStep,
+  priorOutput?: string,
+): string {
   let prompt = `Task: ${step.action}\n\nExpected output: ${step.output}`;
   if (priorOutput) {
     prompt += `\n\nContext from previous step:\n${priorOutput}`;
@@ -145,22 +154,30 @@ export function runWorkflow(
 
   console.log(`\nWorkflow: ${workflow.frontmatter.name}`);
   console.log(`Description: ${workflow.frontmatter.description}`);
-  console.log(`Steps: ${workflow.steps.length} | Max iterations: ${policy.max_iterations}`);
+  console.log(
+    `Steps: ${workflow.steps.length} | Max iterations: ${policy.max_iterations}`,
+  );
   console.log(`Mode: ${dryRun ? "DRY RUN" : "LIVE"}\n`);
 
   let stepIndex = 0;
   let priorOutput: string | undefined;
   let iterations = 0;
 
-  while (stepIndex < workflow.steps.length && iterations < policy.max_iterations) {
+  while (
+    stepIndex < workflow.steps.length &&
+    iterations < policy.max_iterations
+  ) {
     iterations++;
-    const step = workflow.steps[stepIndex]!;
+    const step = workflow.steps[stepIndex];
+    if (!step) break;
 
     // Determine the model tier from agent name
     const tier = agentNameToTier(step.agent);
     const model = resolveModel(config, tier);
 
-    console.log(`  Step ${stepIndex + 1}/${workflow.steps.length}: [${step.agent}] ${step.action}`);
+    console.log(
+      `  Step ${stepIndex + 1}/${workflow.steps.length}: [${step.agent}] ${step.action}`,
+    );
 
     if (dryRun) {
       const args = buildGeminiArgs({ model, approvalMode: "auto" });
@@ -199,14 +216,26 @@ export function runWorkflow(
 
     // Check gate
     const gatePassed = evaluateGate(step.gate, output);
-    console.log(`    Gate "${step.gate}": ${gatePassed ? "PASSED" : "FAILED"} (${elapsed}ms)`);
+    console.log(
+      `    Gate "${step.gate}": ${gatePassed ? "PASSED" : "FAILED"} (${elapsed}ms)`,
+    );
 
-    result.steps.push({ stepIndex, agent: step.agent, output, gatePassed, elapsedMs: elapsed });
+    result.steps.push({
+      stepIndex,
+      agent: step.agent,
+      output,
+      gatePassed,
+      elapsedMs: elapsed,
+    });
 
     // Update workflow state
     workflowState.currentStep = stepIndex;
     workflowState.iterations = iterations;
-    workflowState.stepResults.push({ stepIndex, gatePassed, elapsedMs: elapsed });
+    workflowState.stepResults.push({
+      stepIndex,
+      gatePassed,
+      elapsedMs: elapsed,
+    });
     workflowState.updatedAt = new Date().toISOString();
     stateManager.saveWorkflowState(workflowState);
 
@@ -218,7 +247,11 @@ export function runWorkflow(
     });
 
     if (!gatePassed) {
-      if (step.loop_to !== undefined && step.loop_to >= 0 && step.loop_to < workflow.steps.length) {
+      if (
+        step.loop_to !== undefined &&
+        step.loop_to >= 0 &&
+        step.loop_to < workflow.steps.length
+      ) {
         console.log(`    Looping back to step ${step.loop_to + 1}`);
         stepIndex = step.loop_to;
         priorOutput = output;
@@ -226,7 +259,9 @@ export function runWorkflow(
       }
 
       if (policy.halt_on_failure) {
-        console.log(`\n  Workflow halted at step ${stepIndex + 1} (gate failed, halt_on_failure=true)`);
+        console.log(
+          `\n  Workflow halted at step ${stepIndex + 1} (gate failed, halt_on_failure=true)`,
+        );
         result.status = "failed";
         workflowState.status = "failed";
         stateManager.saveWorkflowState(workflowState);
@@ -238,7 +273,10 @@ export function runWorkflow(
     stepIndex++;
   }
 
-  if (iterations >= policy.max_iterations && stepIndex < workflow.steps.length) {
+  if (
+    iterations >= policy.max_iterations &&
+    stepIndex < workflow.steps.length
+  ) {
     console.log(`\n  ${formatError("GP_022")}`);
     result.status = "failed";
     workflowState.status = "failed";
@@ -252,7 +290,9 @@ export function runWorkflow(
   workflowState.updatedAt = new Date().toISOString();
   stateManager.saveWorkflowState(workflowState);
 
-  console.log(`\nWorkflow ${result.status}. Iterations: ${iterations}, Total time: ${result.totalElapsedMs}ms\n`);
+  console.log(
+    `\nWorkflow ${result.status}. Iterations: ${iterations}, Total time: ${result.totalElapsedMs}ms\n`,
+  );
 
   return result;
 }
@@ -267,7 +307,13 @@ export function runWorkflow(
  * @returns Corresponding model tier
  */
 function agentNameToTier(agentName: string): "high" | "balanced" | "fast" {
-  const highAgents = ["architect", "planner", "analyst", "scientist", "security-auditor"];
+  const highAgents = [
+    "architect",
+    "planner",
+    "analyst",
+    "scientist",
+    "security-auditor",
+  ];
   const fastAgents = ["executor", "debugger", "test-engineer"];
   if (highAgents.includes(agentName)) return "high";
   if (fastAgents.includes(agentName)) return "fast";

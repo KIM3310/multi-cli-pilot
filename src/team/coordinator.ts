@@ -7,13 +7,12 @@
  * @module team/coordinator
  */
 
-import { execSync, spawn, type ChildProcess } from "node:child_process";
+import { type ChildProcess, execSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import type { GeminiPilotConfig } from "../config/schema.js";
-import type { AgentDefinition } from "../agents/registry.js";
+import { ensureGeminiInstalled } from "../harness/session.js";
 import { StateManager, type TeamState } from "../state/index.js";
 import { createLogger } from "../utils/logger.js";
-import { ensureGeminiInstalled } from "../harness/session.js";
 
 const log = createLogger("team");
 
@@ -35,7 +34,8 @@ export interface WorkerInfo {
  */
 function commandExists(cmd: string): boolean {
   try {
-    const checkCmd = process.platform === "win32" ? `where ${cmd}` : `which ${cmd}`;
+    const checkCmd =
+      process.platform === "win32" ? `where ${cmd}` : `which ${cmd}`;
     execSync(checkCmd, { stdio: "pipe" });
     return true;
   } catch {
@@ -96,7 +96,9 @@ export function sendToTmuxPane(paneId: string, command: string): void {
   try {
     // Use -- to prevent argument injection via paneId and pass command safely
     const escaped = command.replace(/'/g, "'\\''");
-    execSync(`tmux send-keys -t '${paneId}' '${escaped}' Enter`, { stdio: "pipe" });
+    execSync(`tmux send-keys -t '${paneId}' '${escaped}' Enter`, {
+      stdio: "pipe",
+    });
   } catch (err) {
     log.error(`Failed to send command to pane ${paneId}`, err);
   }
@@ -135,10 +137,7 @@ export function initTeamState(options: TeamOptions): TeamState {
 /**
  * Add a task to the team queue.
  */
-export function enqueueTask(
-  state: TeamState,
-  description: string,
-): TeamState {
+export function enqueueTask(state: TeamState, description: string): TeamState {
   const task = {
     id: randomUUID().slice(0, 8),
     description,
@@ -195,9 +194,7 @@ export function completeTask(
         : w,
     ),
     taskQueue: state.taskQueue.map((t) =>
-      t.id === taskId
-        ? { ...t, status: "done" as const, result }
-        : t,
+      t.id === taskId ? { ...t, status: "done" as const, result } : t,
     ),
   };
 }
@@ -208,7 +205,8 @@ export function completeTask(
 export function advancePhase(state: TeamState): TeamState {
   const phases: TeamState["phase"][] = ["plan", "execute", "verify", "fix"];
   const currentIndex = phases.indexOf(state.phase);
-  const nextPhase = phases[(currentIndex + 1) % phases.length]!;
+  const nextPhase =
+    phases[(Math.max(currentIndex, 0) + 1) % phases.length] ?? "plan";
 
   log.info(`Phase transition: ${state.phase} -> ${nextPhase}`);
 
@@ -222,7 +220,7 @@ export function advancePhase(state: TeamState): TeamState {
  * Launch team mode with tmux-based parallel execution.
  */
 export function launchTeam(
-  config: GeminiPilotConfig,
+  _config: GeminiPilotConfig,
   options: TeamOptions,
 ): void {
   // Ensure gemini CLI is available before launching team
@@ -232,8 +230,8 @@ export function launchTeam(
     log.error("tmux is not installed. Team mode requires tmux.");
     console.error(
       "Error: tmux is required for team mode. Install it with:\n" +
-      "  macOS: brew install tmux\n" +
-      "  Ubuntu: sudo apt install tmux",
+        "  macOS: brew install tmux\n" +
+        "  Ubuntu: sudo apt install tmux",
     );
     process.exit(1);
   }
@@ -263,7 +261,9 @@ export function launchTeam(
     const firstPane = execSync(
       `tmux list-panes -t "${sessionName}" -F "#{pane_id}"`,
       { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] },
-    ).trim().split("\n")[0];
+    )
+      .trim()
+      .split("\n")[0];
     if (firstPane) paneIds.push(firstPane);
   } catch {
     // non-fatal
@@ -287,5 +287,7 @@ export function launchTeam(
     sendToTmuxPane(paneId, `gp harness --agent ${role}`);
   }
 
-  console.log(`\nTeam session ready. Attach with:\n  tmux attach -t ${sessionName}\n`);
+  console.log(
+    `\nTeam session ready. Attach with:\n  tmux attach -t ${sessionName}\n`,
+  );
 }

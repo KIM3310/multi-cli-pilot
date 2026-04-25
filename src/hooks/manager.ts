@@ -20,7 +20,10 @@ export type HookEvent =
   | "team-phase"
   | "error";
 
-export type HookHandler = (event: HookEvent, data: Record<string, unknown>) => void | Promise<void>;
+export type HookHandler = (
+  event: HookEvent,
+  data: Record<string, unknown>,
+) => void | Promise<void>;
 
 /**
  * Hook manager: register and emit lifecycle events.
@@ -52,7 +55,10 @@ export class HookManager {
   /**
    * Emit an event, calling all registered handlers.
    */
-  async emit(event: HookEvent, data: Record<string, unknown> = {}): Promise<void> {
+  async emit(
+    event: HookEvent,
+    data: Record<string, unknown> = {},
+  ): Promise<void> {
     const handlers = this.handlers.get(event) ?? [];
     log.debug(`Emitting hook: ${event} (${handlers.length} handlers)`);
 

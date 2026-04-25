@@ -7,13 +7,12 @@
  * @module init/templates
  */
 
-import * as fs from "node:fs";
 import * as path from "node:path";
+import { formatError } from "../errors/index.js";
 import { ensureDir, writeJsonFile, writeTextFile } from "../utils/fs.js";
 import { createLogger } from "../utils/logger.js";
-import { formatError } from "../errors/index.js";
 
-const log = createLogger("init");
+const _log = createLogger("init");
 
 /** Known template names. */
 export type TemplateName = "node" | "python" | "fullstack";
@@ -45,7 +44,8 @@ export interface ProjectTemplate {
 function nodeTemplate(): ProjectTemplate {
   return {
     name: "node",
-    description: "Node.js / TypeScript project with testing and linting workflows",
+    description:
+      "Node.js / TypeScript project with testing and linting workflows",
     config: {
       models: {
         high: "gemini-3.1-pro",
@@ -108,7 +108,8 @@ execution_policy:
 function pythonTemplate(): ProjectTemplate {
   return {
     name: "python",
-    description: "Python project with pytest, type-checking, and formatting workflows",
+    description:
+      "Python project with pytest, type-checking, and formatting workflows",
     config: {
       models: {
         high: "gemini-3.1-pro",
@@ -165,7 +166,8 @@ execution_policy:
 function fullstackTemplate(): ProjectTemplate {
   return {
     name: "fullstack",
-    description: "Full-stack project with frontend, backend, and E2E testing workflows",
+    description:
+      "Full-stack project with frontend, backend, and E2E testing workflows",
     config: {
       models: {
         high: "gemini-3.1-pro",
@@ -280,7 +282,9 @@ export function applyTemplate(projectRoot: string, templateName: string): void {
   writeJsonFile(path.join(stateDir, "memory.json"), {
     techStack: template.techStack,
     conventions: template.conventions,
-    notes: [`Initialized with "${templateName}" template on ${new Date().toISOString()}`],
+    notes: [
+      `Initialized with "${templateName}" template on ${new Date().toISOString()}`,
+    ],
     decisions: [],
   });
 

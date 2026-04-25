@@ -7,16 +7,21 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { getStateDir, readJsonFile, writeJsonFile, ensureDir } from "../utils/fs.js";
+import {
+  ensureDir,
+  getStateDir,
+  readJsonFile,
+  writeJsonFile,
+} from "../utils/fs.js";
 import { createLogger } from "../utils/logger.js";
 import {
-  type SessionState,
-  type WorkflowState,
-  type TeamState,
-  type ProjectMemory,
   type Notepad,
-  ProjectMemorySchema,
   NotepadSchema,
+  type ProjectMemory,
+  ProjectMemorySchema,
+  type SessionState,
+  type TeamState,
+  type WorkflowState,
 } from "./schema.js";
 
 const log = createLogger("state");
@@ -113,7 +118,9 @@ export class StateManager {
    */
   saveWorkflowState(state: WorkflowState): void {
     writeJsonFile(this.getWorkflowStatePath(), state);
-    log.debug(`Workflow state saved: ${state.workflowName} step ${state.currentStep}`);
+    log.debug(
+      `Workflow state saved: ${state.workflowName} step ${state.currentStep}`,
+    );
   }
 
   /**

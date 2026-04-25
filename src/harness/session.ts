@@ -5,20 +5,22 @@
  * @module harness/session
  */
 
-import { execSync, execFileSync, spawnSync, type ExecSyncOptions } from "node:child_process";
-import { spawn } from "node:child_process";
-import * as path from "node:path";
-import * as fs from "node:fs";
+import { execFileSync, execSync, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import type { MultiCliPilotConfig, ModelTier, ApprovalMode } from "../config/schema.js";
+import * as path from "node:path";
 import type { AgentDefinition } from "../agents/registry.js";
-import { StateManager, type SessionState, type SessionMetrics } from "../state/index.js";
-import { createLogger } from "../utils/logger.js";
-import { readTextFile, findProjectRoot } from "../utils/fs.js";
-import { hooks } from "../hooks/index.js";
+import type {
+  ApprovalMode,
+  ModelTier,
+  MultiCliPilotConfig,
+} from "../config/schema.js";
 import { formatError } from "../errors/index.js";
+import { hooks } from "../hooks/index.js";
 import { createPromptRegistry } from "../prompts/index.js";
-import { getProvider, type CliProvider } from "../providers/index.js";
+import { type CliProvider, getProvider } from "../providers/index.js";
+import { type SessionState, StateManager } from "../state/index.js";
+import { findProjectRoot, readTextFile } from "../utils/fs.js";
+import { createLogger } from "../utils/logger.js";
 
 /** Legacy alias kept for callers that still use `GeminiPilotConfig`. */
 type GeminiPilotConfig = MultiCliPilotConfig;
@@ -33,7 +35,8 @@ const log = createLogger("harness");
  */
 export function isCliInstalled(binary = "gemini"): boolean {
   try {
-    const checkCmd = process.platform === "win32" ? `where ${binary}` : `which ${binary}`;
+    const checkCmd =
+      process.platform === "win32" ? `where ${binary}` : `which ${binary}`;
     execSync(checkCmd, { stdio: "pipe" });
     return true;
   } catch {
@@ -103,19 +106,19 @@ export function buildSystemPrompt(options: {
   const parts: string[] = [];
 
   if (options.agentsContract) {
-    parts.push("# Orchestration Contract\n\n" + options.agentsContract);
+    parts.push(`# Orchestration Contract\n\n${options.agentsContract}`);
   }
 
   if (options.agent) {
-    parts.push("# Your Role\n\n" + options.agent.systemPrompt);
+    parts.push(`# Your Role\n\n${options.agent.systemPrompt}`);
   }
 
   if (options.projectMemory) {
-    parts.push("# Project Memory\n\n" + options.projectMemory);
+    parts.push(`# Project Memory\n\n${options.projectMemory}`);
   }
 
   if (options.workflowContext) {
-    parts.push("# Active Workflow\n\n" + options.workflowContext);
+    parts.push(`# Active Workflow\n\n${options.workflowContext}`);
   }
 
   // Inject tool-calling optimization prompt when tools are in use
@@ -152,7 +155,10 @@ export function loadToolCallingPrompt(): string | undefined {
  * @param tier - Desired model quality tier
  * @returns Model identifier string (e.g. "gemini-3.1-pro")
  */
-export function resolveModel(config: GeminiPilotConfig, tier: ModelTier): string {
+export function resolveModel(
+  config: GeminiPilotConfig,
+  tier: ModelTier,
+): string {
   return config.models[tier];
 }
 
@@ -289,14 +295,12 @@ export function launchSession(
 
   // Build system prompt with context injection
   const agentsContract =
-    options.agentsContract ??
-    readTextFile(path.join(projectRoot, "AGENTS.md"));
+    options.agentsContract ?? readTextFile(path.join(projectRoot, "AGENTS.md"));
 
   const stateManager = new StateManager(projectRoot);
   const memory = stateManager.loadMemory();
-  const memoryText = memory.notes.length > 0
-    ? JSON.stringify(memory, null, 2)
-    : undefined;
+  const memoryText =
+    memory.notes.length > 0 ? JSON.stringify(memory, null, 2) : undefined;
 
   const systemPrompt = buildSystemPrompt({
     agent: options.agent,
@@ -351,12 +355,17 @@ export function launchSession(
 
   child.on("close", (code) => {
     const elapsed = Date.now() - startTime;
+    const metrics = session.metrics ?? {
+      promptsSent: 0,
+      estimatedTokens: 0,
+      elapsedMs: 0,
+    };
 
     if (code === 0 || code === null) {
       session.status = "completed";
       session.endedAt = new Date().toISOString();
       session.metrics = {
-        ...session.metrics!,
+        ...metrics,
         elapsedMs: elapsed,
       };
       stateManager.saveSession(session);
@@ -369,7 +378,7 @@ export function launchSession(
       session.status = "error";
       session.endedAt = new Date().toISOString();
       session.metrics = {
-        ...session.metrics!,
+        ...metrics,
         elapsedMs: elapsed,
       };
       stateManager.saveSession(session);
@@ -385,10 +394,15 @@ export function launchSession(
 
   child.on("error", (err) => {
     const elapsed = Date.now() - startTime;
+    const metrics = session.metrics ?? {
+      promptsSent: 0,
+      estimatedTokens: 0,
+      elapsedMs: 0,
+    };
     session.status = "error";
     session.endedAt = new Date().toISOString();
     session.metrics = {
-      ...session.metrics!,
+      ...metrics,
       elapsedMs: elapsed,
     };
     stateManager.saveSession(session);

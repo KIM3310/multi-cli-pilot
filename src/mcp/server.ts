@@ -9,8 +9,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { StateManager } from "../state/manager.js";
-import { createLogger } from "../utils/logger.js";
 import { getPackageVersion } from "../utils/fs.js";
+import { createLogger } from "../utils/logger.js";
 
 const log = createLogger("mcp");
 
@@ -33,7 +33,11 @@ export function createMcpServer(projectRoot?: string): McpServer {
   server.tool(
     "state_read",
     "Read a value from project state by key path",
-    { key: z.string().describe("Dot-separated key path (e.g., 'memory.techStack')") },
+    {
+      key: z
+        .string()
+        .describe("Dot-separated key path (e.g., 'memory.techStack')"),
+    },
     async ({ key }) => {
       const parts = key.split(".");
       const root = parts[0];
@@ -53,14 +57,20 @@ export function createMcpServer(projectRoot?: string): McpServer {
           data = state.loadTeamState();
           break;
         default:
-          return { content: [{ type: "text" as const, text: `Unknown state root: ${root}` }] };
+          return {
+            content: [
+              { type: "text" as const, text: `Unknown state root: ${root}` },
+            ],
+          };
       }
 
       // Navigate the key path
       let current: unknown = data;
       for (let i = 1; i < parts.length; i++) {
+        const part = parts[i];
+        if (part === undefined) break;
         if (current && typeof current === "object") {
-          current = (current as Record<string, unknown>)[parts[i]!];
+          current = (current as Record<string, unknown>)[part];
         } else {
           current = undefined;
           break;
@@ -68,7 +78,12 @@ export function createMcpServer(projectRoot?: string): McpServer {
       }
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(current, null, 2) ?? "null" }],
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(current, null, 2) ?? "null",
+          },
+        ],
       };
     },
   );
@@ -85,7 +100,14 @@ export function createMcpServer(projectRoot?: string): McpServer {
       try {
         parsed = JSON.parse(value);
       } catch (err) {
-        return { content: [{ type: "text" as const, text: `Invalid JSON: ${(err as Error).message}` }] };
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Invalid JSON: ${(err as Error).message}`,
+            },
+          ],
+        };
       }
 
       switch (key) {
@@ -96,10 +118,16 @@ export function createMcpServer(projectRoot?: string): McpServer {
           state.saveNotepad(parsed as Parameters<typeof state.saveNotepad>[0]);
           break;
         default:
-          return { content: [{ type: "text" as const, text: `Cannot write to: ${key}` }] };
+          return {
+            content: [
+              { type: "text" as const, text: `Cannot write to: ${key}` },
+            ],
+          };
       }
 
-      return { content: [{ type: "text" as const, text: `Saved ${key} successfully` }] };
+      return {
+        content: [{ type: "text" as const, text: `Saved ${key} successfully` }],
+      };
     },
   );
 
@@ -122,12 +150,18 @@ export function createMcpServer(projectRoot?: string): McpServer {
           decisions: memory.decisions.length,
         },
         notepad: { entries: notepad.entries.length },
-        workflow: workflow ? { name: workflow.workflowName, step: workflow.currentStep } : null,
+        workflow: workflow
+          ? { name: workflow.workflowName, step: workflow.currentStep }
+          : null,
         team: team ? { id: team.id, workers: team.workerCount } : null,
         sessions: { count: sessions.length },
       };
 
-      return { content: [{ type: "text" as const, text: JSON.stringify(info, null, 2) }] };
+      return {
+        content: [
+          { type: "text" as const, text: JSON.stringify(info, null, 2) },
+        ],
+      };
     },
   );
 
@@ -139,17 +173,27 @@ export function createMcpServer(projectRoot?: string): McpServer {
     { note: z.string().describe("The note content to add") },
     async ({ note }) => {
       state.addMemoryNote(note);
-      return { content: [{ type: "text" as const, text: `Note added: ${note}` }] };
+      return {
+        content: [{ type: "text" as const, text: `Note added: ${note}` }],
+      };
     },
   );
 
   server.tool(
     "memory_add_tech",
     "Add a technology to the project tech stack",
-    { tech: z.string().describe("Technology name (e.g., 'TypeScript', 'React')") },
+    {
+      tech: z
+        .string()
+        .describe("Technology name (e.g., 'TypeScript', 'React')"),
+    },
     async ({ tech }) => {
       state.addTechStack(tech);
-      return { content: [{ type: "text" as const, text: `Added to tech stack: ${tech}` }] };
+      return {
+        content: [
+          { type: "text" as const, text: `Added to tech stack: ${tech}` },
+        ],
+      };
     },
   );
 
@@ -159,7 +203,11 @@ export function createMcpServer(projectRoot?: string): McpServer {
     { convention: z.string().describe("The convention to record") },
     async ({ convention }) => {
       state.addConvention(convention);
-      return { content: [{ type: "text" as const, text: `Convention added: ${convention}` }] };
+      return {
+        content: [
+          { type: "text" as const, text: `Convention added: ${convention}` },
+        ],
+      };
     },
   );
 
@@ -172,7 +220,11 @@ export function createMcpServer(projectRoot?: string): McpServer {
     },
     async ({ decision, rationale }) => {
       state.addDecision(decision, rationale);
-      return { content: [{ type: "text" as const, text: `Decision recorded: ${decision}` }] };
+      return {
+        content: [
+          { type: "text" as const, text: `Decision recorded: ${decision}` },
+        ],
+      };
     },
   );
 
@@ -188,7 +240,14 @@ export function createMcpServer(projectRoot?: string): McpServer {
     async ({ content, tags }) => {
       const tagList = tags ? tags.split(",").map((t) => t.trim()) : [];
       state.addNote(content, tagList);
-      return { content: [{ type: "text" as const, text: `Note added with ${tagList.length} tags` }] };
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Note added with ${tagList.length} tags`,
+          },
+        ],
+      };
     },
   );
 
@@ -198,27 +257,30 @@ export function createMcpServer(projectRoot?: string): McpServer {
     { tag: z.string().optional().describe("Filter by tag") },
     async ({ tag }) => {
       const notes = state.getNotes(tag);
-      return { content: [{ type: "text" as const, text: JSON.stringify(notes, null, 2) }] };
+      return {
+        content: [
+          { type: "text" as const, text: JSON.stringify(notes, null, 2) },
+        ],
+      };
     },
   );
 
   // --- Session Tools ---
 
-  server.tool(
-    "session_list",
-    "List all recorded sessions",
-    {},
-    async () => {
-      const sessions = state.listSessions();
-      const summary = sessions.map((s) => ({
-        id: s.id,
-        agent: s.agent,
-        status: s.status,
-        startedAt: s.startedAt,
-      }));
-      return { content: [{ type: "text" as const, text: JSON.stringify(summary, null, 2) }] };
-    },
-  );
+  server.tool("session_list", "List all recorded sessions", {}, async () => {
+    const sessions = state.listSessions();
+    const summary = sessions.map((s) => ({
+      id: s.id,
+      agent: s.agent,
+      status: s.status,
+      startedAt: s.startedAt,
+    }));
+    return {
+      content: [
+        { type: "text" as const, text: JSON.stringify(summary, null, 2) },
+      ],
+    };
+  });
 
   server.tool(
     "session_get",
@@ -227,9 +289,17 @@ export function createMcpServer(projectRoot?: string): McpServer {
     async ({ sessionId }) => {
       const session = state.loadSession(sessionId);
       if (!session) {
-        return { content: [{ type: "text" as const, text: `Session not found: ${sessionId}` }] };
+        return {
+          content: [
+            { type: "text" as const, text: `Session not found: ${sessionId}` },
+          ],
+        };
       }
-      return { content: [{ type: "text" as const, text: JSON.stringify(session, null, 2) }] };
+      return {
+        content: [
+          { type: "text" as const, text: JSON.stringify(session, null, 2) },
+        ],
+      };
     },
   );
 

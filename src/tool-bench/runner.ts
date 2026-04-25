@@ -7,10 +7,10 @@
  * @module tool-bench/runner
  */
 
-import { createLogger } from "../utils/logger.js";
 import { createPromptRegistry } from "../prompts/index.js";
+import { createLogger } from "../utils/logger.js";
 
-const log = createLogger("tool-bench");
+const _log = createLogger("tool-bench");
 
 // ---------------------------------------------------------------------------
 // Schema & case types
@@ -18,7 +18,14 @@ const log = createLogger("tool-bench");
 
 /** JSON Schema-style parameter definition. */
 export interface ParamSchema {
-  type: "string" | "number" | "integer" | "boolean" | "array" | "object" | "null";
+  type:
+    | "string"
+    | "number"
+    | "integer"
+    | "boolean"
+    | "array"
+    | "object"
+    | "null";
   required?: boolean;
   enum?: unknown[];
   items?: { type: string };
@@ -82,71 +89,101 @@ export function getToolBenchCases(): ToolBenchCase[] {
       id: "simple-01",
       category: "simple",
       prompt: "Get the current weather in San Francisco",
-      tools: [{
-        name: "get_weather",
-        description: "Get current weather for a city",
-        parameters: {
-          city: { type: "string", required: true, description: "City name" },
-          units: { type: "string", enum: ["celsius", "fahrenheit"], description: "Temperature units" },
+      tools: [
+        {
+          name: "get_weather",
+          description: "Get current weather for a city",
+          parameters: {
+            city: { type: "string", required: true, description: "City name" },
+            units: {
+              type: "string",
+              enum: ["celsius", "fahrenheit"],
+              description: "Temperature units",
+            },
+          },
         },
-      }],
+      ],
       expected: [{ name: "get_weather", arguments: { city: "San Francisco" } }],
     },
     {
       id: "simple-02",
       category: "simple",
       prompt: "Create a new user named Alice with email alice@example.com",
-      tools: [{
-        name: "create_user",
-        description: "Create a new user account",
-        parameters: {
-          name: { type: "string", required: true },
-          email: { type: "string", required: true },
-          role: { type: "string", enum: ["admin", "user", "viewer"] },
+      tools: [
+        {
+          name: "create_user",
+          description: "Create a new user account",
+          parameters: {
+            name: { type: "string", required: true },
+            email: { type: "string", required: true },
+            role: { type: "string", enum: ["admin", "user", "viewer"] },
+          },
         },
-      }],
-      expected: [{ name: "create_user", arguments: { name: "Alice", email: "alice@example.com" } }],
+      ],
+      expected: [
+        {
+          name: "create_user",
+          arguments: { name: "Alice", email: "alice@example.com" },
+        },
+      ],
     },
     {
       id: "simple-03",
       category: "simple",
       prompt: "Delete file at /tmp/old_logs.txt",
-      tools: [{
-        name: "delete_file",
-        description: "Delete a file by path",
-        parameters: {
-          path: { type: "string", required: true, description: "Absolute file path" },
+      tools: [
+        {
+          name: "delete_file",
+          description: "Delete a file by path",
+          parameters: {
+            path: {
+              type: "string",
+              required: true,
+              description: "Absolute file path",
+            },
+          },
         },
-      }],
-      expected: [{ name: "delete_file", arguments: { path: "/tmp/old_logs.txt" } }],
+      ],
+      expected: [
+        { name: "delete_file", arguments: { path: "/tmp/old_logs.txt" } },
+      ],
     },
     {
       id: "simple-04",
       category: "simple",
       prompt: "List all repositories for organization acme-corp",
-      tools: [{
-        name: "list_repos",
-        description: "List repositories for an organization",
-        parameters: {
-          org: { type: "string", required: true },
-          page: { type: "integer" },
+      tools: [
+        {
+          name: "list_repos",
+          description: "List repositories for an organization",
+          parameters: {
+            org: { type: "string", required: true },
+            page: { type: "integer" },
+          },
         },
-      }],
+      ],
       expected: [{ name: "list_repos", arguments: { org: "acme-corp" } }],
     },
     {
       id: "simple-05",
       category: "simple",
       prompt: "Send a notification with message 'Build succeeded'",
-      tools: [{
-        name: "send_notification",
-        description: "Send a push notification",
-        parameters: {
-          message: { type: "string", required: true },
-          priority: { type: "string", enum: ["low", "normal", "high"] },
+      tools: [
+        {
+          name: "send_notification",
+          description: "Send a push notification",
+          parameters: {
+            message: { type: "string", required: true },
+            priority: { type: "string", enum: ["low", "normal", "high"] },
+          },
         },
-      }],
-      expected: [{ name: "send_notification", arguments: { message: "Build succeeded" } }],
+      ],
+      expected: [
+        {
+          name: "send_notification",
+          arguments: { message: "Build succeeded" },
+        },
+      ],
     },
 
     // ---- Category 2: Type coercion challenges ----
@@ -154,197 +191,259 @@ export function getToolBenchCases(): ToolBenchCase[] {
       id: "coerce-01",
       category: "type-coercion",
       prompt: "Set the retry count to 5",
-      tools: [{
-        name: "set_config",
-        description: "Set a configuration value",
-        parameters: {
-          key: { type: "string", required: true },
-          value: { type: "integer", required: true },
+      tools: [
+        {
+          name: "set_config",
+          description: "Set a configuration value",
+          parameters: {
+            key: { type: "string", required: true },
+            value: { type: "integer", required: true },
+          },
         },
-      }],
-      expected: [{ name: "set_config", arguments: { key: "retry_count", value: 5 } }],
+      ],
+      expected: [
+        { name: "set_config", arguments: { key: "retry_count", value: 5 } },
+      ],
     },
     {
       id: "coerce-02",
       category: "type-coercion",
       prompt: "Enable debug mode",
-      tools: [{
-        name: "toggle_feature",
-        description: "Toggle a feature flag",
-        parameters: {
-          feature: { type: "string", required: true },
-          enabled: { type: "boolean", required: true },
+      tools: [
+        {
+          name: "toggle_feature",
+          description: "Toggle a feature flag",
+          parameters: {
+            feature: { type: "string", required: true },
+            enabled: { type: "boolean", required: true },
+          },
         },
-      }],
-      expected: [{ name: "toggle_feature", arguments: { feature: "debug_mode", enabled: true } }],
+      ],
+      expected: [
+        {
+          name: "toggle_feature",
+          arguments: { feature: "debug_mode", enabled: true },
+        },
+      ],
     },
     {
       id: "coerce-03",
       category: "type-coercion",
       prompt: "Set the timeout to 30.5 seconds",
-      tools: [{
-        name: "set_timeout",
-        description: "Set request timeout",
-        parameters: {
-          seconds: { type: "number", required: true },
+      tools: [
+        {
+          name: "set_timeout",
+          description: "Set request timeout",
+          parameters: {
+            seconds: { type: "number", required: true },
+          },
         },
-      }],
+      ],
       expected: [{ name: "set_timeout", arguments: { seconds: 30.5 } }],
     },
     {
       id: "coerce-04",
       category: "type-coercion",
       prompt: "Tag the deployment with labels: production, v2, stable",
-      tools: [{
-        name: "tag_deployment",
-        description: "Add tags to a deployment",
-        parameters: {
-          tags: { type: "array", required: true, items: { type: "string" } },
+      tools: [
+        {
+          name: "tag_deployment",
+          description: "Add tags to a deployment",
+          parameters: {
+            tags: { type: "array", required: true, items: { type: "string" } },
+          },
         },
-      }],
-      expected: [{ name: "tag_deployment", arguments: { tags: ["production", "v2", "stable"] } }],
+      ],
+      expected: [
+        {
+          name: "tag_deployment",
+          arguments: { tags: ["production", "v2", "stable"] },
+        },
+      ],
     },
     {
       id: "coerce-05",
       category: "type-coercion",
       prompt: "Set max connections to 100 and enable pooling",
-      tools: [{
-        name: "configure_db",
-        description: "Configure database connection",
-        parameters: {
-          maxConnections: { type: "integer", required: true },
-          pooling: { type: "boolean", required: true },
+      tools: [
+        {
+          name: "configure_db",
+          description: "Configure database connection",
+          parameters: {
+            maxConnections: { type: "integer", required: true },
+            pooling: { type: "boolean", required: true },
+          },
         },
-      }],
-      expected: [{ name: "configure_db", arguments: { maxConnections: 100, pooling: true } }],
+      ],
+      expected: [
+        {
+          name: "configure_db",
+          arguments: { maxConnections: 100, pooling: true },
+        },
+      ],
     },
 
     // ---- Category 3: Multi-param (required + optional mix) ----
     {
       id: "multi-param-01",
       category: "multi-param",
-      prompt: "Search for TypeScript files modified after 2024-01-01 with max 50 results",
-      tools: [{
-        name: "search_files",
-        description: "Search files with filters",
-        parameters: {
-          query: { type: "string", required: true },
-          language: { type: "string" },
-          modifiedAfter: { type: "string" },
-          maxResults: { type: "integer" },
-          includeArchived: { type: "boolean" },
+      prompt:
+        "Search for TypeScript files modified after 2024-01-01 with max 50 results",
+      tools: [
+        {
+          name: "search_files",
+          description: "Search files with filters",
+          parameters: {
+            query: { type: "string", required: true },
+            language: { type: "string" },
+            modifiedAfter: { type: "string" },
+            maxResults: { type: "integer" },
+            includeArchived: { type: "boolean" },
+          },
         },
-      }],
-      expected: [{
-        name: "search_files",
-        arguments: {
-          query: "TypeScript",
-          language: "typescript",
-          modifiedAfter: "2024-01-01",
-          maxResults: 50,
+      ],
+      expected: [
+        {
+          name: "search_files",
+          arguments: {
+            query: "TypeScript",
+            language: "typescript",
+            modifiedAfter: "2024-01-01",
+            maxResults: 50,
+          },
         },
-      }],
+      ],
     },
     {
       id: "multi-param-02",
       category: "multi-param",
-      prompt: "Create a high-priority bug issue titled 'Login fails on Safari' assigned to alice",
-      tools: [{
-        name: "create_issue",
-        description: "Create a project issue",
-        parameters: {
-          title: { type: "string", required: true },
-          type: { type: "string", required: true, enum: ["bug", "feature", "task"] },
-          priority: { type: "string", enum: ["low", "medium", "high", "critical"] },
-          assignee: { type: "string" },
-          labels: { type: "array", items: { type: "string" } },
+      prompt:
+        "Create a high-priority bug issue titled 'Login fails on Safari' assigned to alice",
+      tools: [
+        {
+          name: "create_issue",
+          description: "Create a project issue",
+          parameters: {
+            title: { type: "string", required: true },
+            type: {
+              type: "string",
+              required: true,
+              enum: ["bug", "feature", "task"],
+            },
+            priority: {
+              type: "string",
+              enum: ["low", "medium", "high", "critical"],
+            },
+            assignee: { type: "string" },
+            labels: { type: "array", items: { type: "string" } },
+          },
         },
-      }],
-      expected: [{
-        name: "create_issue",
-        arguments: {
-          title: "Login fails on Safari",
-          type: "bug",
-          priority: "high",
-          assignee: "alice",
+      ],
+      expected: [
+        {
+          name: "create_issue",
+          arguments: {
+            title: "Login fails on Safari",
+            type: "bug",
+            priority: "high",
+            assignee: "alice",
+          },
         },
-      }],
+      ],
     },
     {
       id: "multi-param-03",
       category: "multi-param",
-      prompt: "Deploy version 2.3.1 to production in us-east-1 with 3 replicas and health checks enabled",
-      tools: [{
-        name: "deploy",
-        description: "Deploy a service version",
-        parameters: {
-          version: { type: "string", required: true },
-          environment: { type: "string", required: true, enum: ["staging", "production"] },
-          region: { type: "string", required: true },
-          replicas: { type: "integer" },
-          healthCheck: { type: "boolean" },
-          rollbackOnFailure: { type: "boolean" },
+      prompt:
+        "Deploy version 2.3.1 to production in us-east-1 with 3 replicas and health checks enabled",
+      tools: [
+        {
+          name: "deploy",
+          description: "Deploy a service version",
+          parameters: {
+            version: { type: "string", required: true },
+            environment: {
+              type: "string",
+              required: true,
+              enum: ["staging", "production"],
+            },
+            region: { type: "string", required: true },
+            replicas: { type: "integer" },
+            healthCheck: { type: "boolean" },
+            rollbackOnFailure: { type: "boolean" },
+          },
         },
-      }],
-      expected: [{
-        name: "deploy",
-        arguments: {
-          version: "2.3.1",
-          environment: "production",
-          region: "us-east-1",
-          replicas: 3,
-          healthCheck: true,
+      ],
+      expected: [
+        {
+          name: "deploy",
+          arguments: {
+            version: "2.3.1",
+            environment: "production",
+            region: "us-east-1",
+            replicas: 3,
+            healthCheck: true,
+          },
         },
-      }],
+      ],
     },
     {
       id: "multi-param-04",
       category: "multi-param",
-      prompt: "Schedule a backup for database 'orders' at midnight UTC, compress it",
-      tools: [{
-        name: "schedule_backup",
-        description: "Schedule a database backup",
-        parameters: {
-          database: { type: "string", required: true },
-          schedule: { type: "string", required: true },
-          compress: { type: "boolean" },
-          retention_days: { type: "integer" },
-          notify_email: { type: "string" },
+      prompt:
+        "Schedule a backup for database 'orders' at midnight UTC, compress it",
+      tools: [
+        {
+          name: "schedule_backup",
+          description: "Schedule a database backup",
+          parameters: {
+            database: { type: "string", required: true },
+            schedule: { type: "string", required: true },
+            compress: { type: "boolean" },
+            retention_days: { type: "integer" },
+            notify_email: { type: "string" },
+          },
         },
-      }],
-      expected: [{
-        name: "schedule_backup",
-        arguments: {
-          database: "orders",
-          schedule: "0 0 * * *",
-          compress: true,
+      ],
+      expected: [
+        {
+          name: "schedule_backup",
+          arguments: {
+            database: "orders",
+            schedule: "0 0 * * *",
+            compress: true,
+          },
         },
-      }],
+      ],
     },
     {
       id: "multi-param-05",
       category: "multi-param",
       prompt: "Resize the image at /uploads/photo.jpg to 800x600 in PNG format",
-      tools: [{
-        name: "resize_image",
-        description: "Resize and convert an image",
-        parameters: {
-          sourcePath: { type: "string", required: true },
-          width: { type: "integer", required: true },
-          height: { type: "integer", required: true },
-          format: { type: "string", enum: ["jpeg", "png", "webp"] },
-          quality: { type: "integer" },
+      tools: [
+        {
+          name: "resize_image",
+          description: "Resize and convert an image",
+          parameters: {
+            sourcePath: { type: "string", required: true },
+            width: { type: "integer", required: true },
+            height: { type: "integer", required: true },
+            format: { type: "string", enum: ["jpeg", "png", "webp"] },
+            quality: { type: "integer" },
+          },
         },
-      }],
-      expected: [{
-        name: "resize_image",
-        arguments: {
-          sourcePath: "/uploads/photo.jpg",
-          width: 800,
-          height: 600,
-          format: "png",
+      ],
+      expected: [
+        {
+          name: "resize_image",
+          arguments: {
+            sourcePath: "/uploads/photo.jpg",
+            width: 800,
+            height: 600,
+            format: "png",
+          },
         },
-      }],
+      ],
     },
 
     // ---- Category 4: Multi-tool chains (sequential dependency) ----
@@ -369,13 +468,17 @@ export function getToolBenchCases(): ToolBenchCase[] {
       ],
       expected: [
         { name: "read_file", arguments: { path: "/etc/app.json" } },
-        { name: "validate_schema", arguments: { json: "{{read_file.output}}", schemaName: "app-config" } },
+        {
+          name: "validate_schema",
+          arguments: { json: "{{read_file.output}}", schemaName: "app-config" },
+        },
       ],
     },
     {
       id: "chain-02",
       category: "multi-tool",
-      prompt: "Find the user with email bob@co.com then list their recent orders",
+      prompt:
+        "Find the user with email bob@co.com then list their recent orders",
       tools: [
         {
           name: "find_user",
@@ -393,13 +496,17 @@ export function getToolBenchCases(): ToolBenchCase[] {
       ],
       expected: [
         { name: "find_user", arguments: { email: "bob@co.com" } },
-        { name: "list_orders", arguments: { userId: "{{find_user.id}}", limit: 10 } },
+        {
+          name: "list_orders",
+          arguments: { userId: "{{find_user.id}}", limit: 10 },
+        },
       ],
     },
     {
       id: "chain-03",
       category: "multi-tool",
-      prompt: "Get the latest commit from main branch then create a tag v3.0.0 for it",
+      prompt:
+        "Get the latest commit from main branch then create a tag v3.0.0 for it",
       tools: [
         {
           name: "get_latest_commit",
@@ -417,13 +524,20 @@ export function getToolBenchCases(): ToolBenchCase[] {
       ],
       expected: [
         { name: "get_latest_commit", arguments: { branch: "main" } },
-        { name: "create_tag", arguments: { commitSha: "{{get_latest_commit.sha}}", tagName: "v3.0.0" } },
+        {
+          name: "create_tag",
+          arguments: {
+            commitSha: "{{get_latest_commit.sha}}",
+            tagName: "v3.0.0",
+          },
+        },
       ],
     },
     {
       id: "chain-04",
       category: "multi-tool",
-      prompt: "Fetch metrics for service 'api-gateway' then create an alert if error rate > 5%",
+      prompt:
+        "Fetch metrics for service 'api-gateway' then create an alert if error rate > 5%",
       tools: [
         {
           name: "fetch_metrics",
@@ -437,19 +551,32 @@ export function getToolBenchCases(): ToolBenchCase[] {
             service: { type: "string", required: true },
             metric: { type: "string", required: true },
             threshold: { type: "number", required: true },
-            operator: { type: "string", required: true, enum: [">", "<", ">=", "<=", "=="] },
+            operator: {
+              type: "string",
+              required: true,
+              enum: [">", "<", ">=", "<=", "=="],
+            },
           },
         },
       ],
       expected: [
         { name: "fetch_metrics", arguments: { service: "api-gateway" } },
-        { name: "create_alert", arguments: { service: "api-gateway", metric: "error_rate", threshold: 5, operator: ">" } },
+        {
+          name: "create_alert",
+          arguments: {
+            service: "api-gateway",
+            metric: "error_rate",
+            threshold: 5,
+            operator: ">",
+          },
+        },
       ],
     },
     {
       id: "chain-05",
       category: "multi-tool",
-      prompt: "Compress /data/logs.csv then upload the compressed file to S3 bucket 'archives'",
+      prompt:
+        "Compress /data/logs.csv then upload the compressed file to S3 bucket 'archives'",
       tools: [
         {
           name: "compress_file",
@@ -471,7 +598,13 @@ export function getToolBenchCases(): ToolBenchCase[] {
       ],
       expected: [
         { name: "compress_file", arguments: { inputPath: "/data/logs.csv" } },
-        { name: "upload_to_s3", arguments: { filePath: "{{compress_file.outputPath}}", bucket: "archives" } },
+        {
+          name: "upload_to_s3",
+          arguments: {
+            filePath: "{{compress_file.outputPath}}",
+            bucket: "archives",
+          },
+        },
       ],
     },
   ];
@@ -496,7 +629,8 @@ export function validateCase(tc: ToolBenchCase): boolean {
     if (!toolNames.includes(exp.name)) return false;
 
     // Required params must be present in expected arguments
-    const tool = tc.tools.find((t) => t.name === exp.name)!;
+    const tool = tc.tools.find((t) => t.name === exp.name);
+    if (!tool) return false;
     for (const [paramName, paramSchema] of Object.entries(tool.parameters)) {
       if (paramSchema.required && !(paramName in exp.arguments)) {
         // Allow template placeholders in multi-tool chains
@@ -522,7 +656,10 @@ export function evaluateCall(
 ): { pass: boolean; reason: string } {
   // 1. Function name match
   if (predicted.name !== expected.name) {
-    return { pass: false, reason: `Wrong function: got '${predicted.name}', expected '${expected.name}'` };
+    return {
+      pass: false,
+      reason: `Wrong function: got '${predicted.name}', expected '${expected.name}'`,
+    };
   }
 
   // 2. Check required params are present
@@ -541,15 +678,22 @@ export function evaluateCall(
 
     const expectedValue = expected.arguments[paramName];
     // Skip template placeholders
-    if (typeof expectedValue === "string" && expectedValue.startsWith("{{")) continue;
+    if (typeof expectedValue === "string" && expectedValue.startsWith("{{"))
+      continue;
 
     if (!checkType(value, schema.type)) {
-      return { pass: false, reason: `Wrong type for '${paramName}': expected ${schema.type}, got ${typeof value}` };
+      return {
+        pass: false,
+        reason: `Wrong type for '${paramName}': expected ${schema.type}, got ${typeof value}`,
+      };
     }
 
     // Enum check
     if (schema.enum && !schema.enum.includes(value)) {
-      return { pass: false, reason: `Invalid enum value for '${paramName}': '${value}'` };
+      return {
+        pass: false,
+        reason: `Invalid enum value for '${paramName}': '${value}'`,
+      };
     }
   }
 
@@ -572,7 +716,9 @@ export function checkType(value: unknown, expectedType: string): boolean {
     case "array":
       return Array.isArray(value);
     case "object":
-      return typeof value === "object" && value !== null && !Array.isArray(value);
+      return (
+        typeof value === "object" && value !== null && !Array.isArray(value)
+      );
     case "null":
       return value === null;
     default:
@@ -587,7 +733,9 @@ export function checkType(value: unknown, expectedType: string): boolean {
  * and simulates evaluation by checking expected outputs against schemas.
  * In a live setup, the model would produce predicted calls.
  */
-export function runToolBench(options?: { withPrompt?: boolean }): ToolBenchResult {
+export function runToolBench(_options?: {
+  withPrompt?: boolean;
+}): ToolBenchResult {
   const cases = getToolBenchCases();
   const results: CaseResult[] = [];
   let passed = 0;
@@ -596,7 +744,12 @@ export function runToolBench(options?: { withPrompt?: boolean }): ToolBenchResul
   for (const tc of cases) {
     // Validate case structure
     if (!validateCase(tc)) {
-      results.push({ id: tc.id, category: tc.category, pass: false, reason: "Invalid case definition" });
+      results.push({
+        id: tc.id,
+        category: tc.category,
+        pass: false,
+        reason: "Invalid case definition",
+      });
       failed++;
       continue;
     }
@@ -627,7 +780,12 @@ export function runToolBench(options?: { withPrompt?: boolean }): ToolBenchResul
       failed++;
     }
 
-    results.push({ id: tc.id, category: tc.category, pass: casePassed, reason });
+    results.push({
+      id: tc.id,
+      category: tc.category,
+      pass: casePassed,
+      reason,
+    });
   }
 
   const successRate = cases.length > 0 ? (passed / cases.length) * 100 : 0;
@@ -668,7 +826,10 @@ export function isToolCallingPromptAvailable(): boolean {
 /**
  * Print a formatted tool-bench results table.
  */
-export function printToolBenchTable(result: ToolBenchResult, label: string): void {
+export function printToolBenchTable(
+  result: ToolBenchResult,
+  label: string,
+): void {
   console.log(`\n  ${label}`);
   console.log(`  ${"─".repeat(60)}`);
   console.log(
@@ -685,5 +846,7 @@ export function printToolBenchTable(result: ToolBenchResult, label: string): voi
     );
   }
 
-  console.log(`\n  Total: ${result.totalCases} | Passed: ${result.passed} | Failed: ${result.failed} | Rate: ${result.successRate.toFixed(1)}%\n`);
+  console.log(
+    `\n  Total: ${result.totalCases} | Passed: ${result.passed} | Failed: ${result.failed} | Rate: ${result.successRate.toFixed(1)}%\n`,
+  );
 }

@@ -8,8 +8,8 @@
  */
 
 import { z } from "zod";
-import type { PromptDefinition } from "../prompts/loader.js";
 import type { ModelsConfig, ModelTier } from "../config/schema.js";
+import type { PromptDefinition } from "../prompts/loader.js";
 import { createLogger } from "../utils/logger.js";
 
 const log = createLogger("agents");
@@ -33,7 +33,8 @@ export type AgentDefinition = z.infer<typeof AgentDefinitionSchema>;
  */
 function modelToTier(model: string): ModelTier {
   if (model.includes("3.1-pro")) return "high";
-  if (model.includes("3.1-flash") && !model.includes("flash-lite")) return "balanced";
+  if (model.includes("3.1-flash") && !model.includes("flash-lite"))
+    return "balanced";
   return "fast";
 }
 

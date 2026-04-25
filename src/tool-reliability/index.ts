@@ -7,37 +7,42 @@
  * @module tool-reliability
  */
 
-export { rjsonParse, type RJsonResult } from "./rjson.js";
-export { coerceToSchema, snakeToCamel, camelToSnake, type CoerceResult } from "./schema-coerce.js";
 export {
+  BENCHMARK_CASES,
+  type BenchmarkCase,
+  formatBenchmarkTable,
+  runToolBenchmark,
+  type ToolBenchmarkResult,
+  type ToolReliabilityCaseResult,
+} from "./benchmark.js";
+export {
+  createToolReliabilityMiddleware,
+  DEFAULT_TOOL_RELIABILITY_CONFIG,
+  executeWithToolReliability,
+  type ToolCallResult,
+  type ToolReliabilityConfig,
+} from "./middleware.js";
+export {
+  type ParseResult,
   parseToolCalls,
   type ToolCall,
   type ToolDefinition,
-  type ParseResult,
 } from "./parser.js";
 export {
-  parseWithRetry,
   buildRetryPrompt,
   createMetricsTracker,
   DEFAULT_RETRY_CONFIG,
+  type ModelCaller,
+  parseWithRetry,
+  type RetryAggregateMetrics,
   type RetryConfig,
   type RetryMetrics,
   type RetryResult,
-  type RetryAggregateMetrics,
-  type ModelCaller,
 } from "./retry.js";
+export { type RJsonResult, rjsonParse } from "./rjson.js";
 export {
-  executeWithToolReliability,
-  createToolReliabilityMiddleware,
-  DEFAULT_TOOL_RELIABILITY_CONFIG,
-  type ToolReliabilityConfig,
-  type ToolCallResult,
-} from "./middleware.js";
-export {
-  runToolBenchmark,
-  formatBenchmarkTable,
-  BENCHMARK_CASES,
-  type BenchmarkCase,
-  type ToolReliabilityCaseResult,
-  type ToolBenchmarkResult,
-} from "./benchmark.js";
+  type CoerceResult,
+  camelToSnake,
+  coerceToSchema,
+  snakeToCamel,
+} from "./schema-coerce.js";

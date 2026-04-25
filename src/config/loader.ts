@@ -11,18 +11,18 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 import * as os from "node:os";
-import {
-  MultiCliPilotConfigSchema,
-  type MultiCliPilotConfig,
-  DEFAULT_CONFIG,
-  ProviderIdSchema,
-  type ProviderId,
-} from "./schema.js";
-import { readJsonFile, getStateDir } from "../utils/fs.js";
-import { createLogger } from "../utils/logger.js";
+import * as path from "node:path";
 import { getProvider } from "../providers/index.js";
+import { getStateDir, readJsonFile } from "../utils/fs.js";
+import { createLogger } from "../utils/logger.js";
+import {
+  DEFAULT_CONFIG,
+  type MultiCliPilotConfig,
+  MultiCliPilotConfigSchema,
+  type ProviderId,
+  ProviderIdSchema,
+} from "./schema.js";
 
 /** Alias retained for older import sites. */
 type GeminiPilotConfig = MultiCliPilotConfig;
@@ -46,7 +46,10 @@ export function getProjectConfigPath(projectRoot?: string): string {
 /**
  * Deep merge two objects. Source values override target values.
  */
-function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
+function deepMerge<T extends Record<string, unknown>>(
+  target: T,
+  source: Partial<T>,
+): T {
   const result = { ...target };
   for (const key of Object.keys(source) as Array<keyof T>) {
     const sourceVal = source[key];
@@ -79,16 +82,21 @@ function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial
  * existing user configs untouched while giving Qwen users sensible
  * model ids out of the box.
  */
-function applyProviderDefaults(config: MultiCliPilotConfig): MultiCliPilotConfig {
+function applyProviderDefaults(
+  config: MultiCliPilotConfig,
+): MultiCliPilotConfig {
   const provider = getProvider(config.provider);
   if (provider.id === "gemini") {
     return config;
   }
   const geminiDefaults = DEFAULT_CONFIG.models;
   const models = { ...config.models };
-  if (models.high === geminiDefaults.high) models.high = provider.defaultModels.high;
-  if (models.balanced === geminiDefaults.balanced) models.balanced = provider.defaultModels.balanced;
-  if (models.fast === geminiDefaults.fast) models.fast = provider.defaultModels.fast;
+  if (models.high === geminiDefaults.high)
+    models.high = provider.defaultModels.high;
+  if (models.balanced === geminiDefaults.balanced)
+    models.balanced = provider.defaultModels.balanced;
+  if (models.fast === geminiDefaults.fast)
+    models.fast = provider.defaultModels.fast;
   return { ...config, models };
 }
 
@@ -133,7 +141,9 @@ export function loadConfig(projectRoot?: string): GeminiPilotConfig {
   let config: GeminiPilotConfig = { ...DEFAULT_CONFIG };
 
   // Layer 1: User config
-  const userConfig = readJsonFile<Partial<GeminiPilotConfig>>(getUserConfigPath());
+  const userConfig = readJsonFile<Partial<GeminiPilotConfig>>(
+    getUserConfigPath(),
+  );
   if (userConfig) {
     log.debug("Loaded user config");
     config = deepMerge(config, userConfig);
@@ -167,18 +177,17 @@ export function loadConfig(projectRoot?: string): GeminiPilotConfig {
 /**
  * Validate a config object against the schema.
  */
-export function validateConfig(
-  config: unknown,
-): { valid: boolean; errors?: string[] } {
+export function validateConfig(config: unknown): {
+  valid: boolean;
+  errors?: string[];
+} {
   const result = MultiCliPilotConfigSchema.safeParse(config);
   if (result.success) {
     return { valid: true };
   }
   return {
     valid: false,
-    errors: result.error.issues.map(
-      (i) => `${i.path.join(".")}: ${i.message}`,
-    ),
+    errors: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
   };
 }
 
@@ -187,9 +196,10 @@ export function validateConfig(
  * Unlike loadConfig(), this does NOT silently fall back to defaults --
  * it reports JSON parse errors and schema violations directly.
  */
-export function loadAndValidateConfigFile(
-  projectRoot?: string,
-): { valid: boolean; errors?: string[] } {
+export function loadAndValidateConfigFile(projectRoot?: string): {
+  valid: boolean;
+  errors?: string[];
+} {
   const configPath = getProjectConfigPath(projectRoot);
   let raw: string;
   try {

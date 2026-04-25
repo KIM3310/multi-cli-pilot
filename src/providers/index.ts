@@ -57,10 +57,11 @@ const QWEN: CliProvider = {
 };
 
 /** Registry of all supported providers, keyed by id. */
-export const PROVIDERS: Readonly<Record<ProviderId, CliProvider>> = Object.freeze({
-  gemini: GEMINI,
-  qwen: QWEN,
-});
+export const PROVIDERS: Readonly<Record<ProviderId, CliProvider>> =
+  Object.freeze({
+    gemini: GEMINI,
+    qwen: QWEN,
+  });
 
 /**
  * Resolve a provider by id.

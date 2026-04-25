@@ -36,7 +36,8 @@ export function formatDuration(ms: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  if (hours > 0) return `${hours}h${String(minutes).padStart(2, "0")}m${String(seconds).padStart(2, "0")}s`;
+  if (hours > 0)
+    return `${hours}h${String(minutes).padStart(2, "0")}m${String(seconds).padStart(2, "0")}s`;
   if (minutes > 0) return `${minutes}m${String(seconds).padStart(2, "0")}s`;
   return `${seconds}s`;
 }
@@ -100,9 +101,10 @@ export function renderHudFull(state: HudState): string {
   const workflow = state.activeWorkflow
     ? `${C.magenta}${state.activeWorkflow}${C.reset} [${state.workflowStep}]`
     : `${C.dim}none${C.reset}`;
-  const team = state.teamWorkers > 0
-    ? `${C.cyan}${state.teamWorkers}${C.reset} workers`
-    : `${C.dim}-${C.reset}`;
+  const team =
+    state.teamWorkers > 0
+      ? `${C.cyan}${state.teamWorkers}${C.reset} workers`
+      : `${C.dim}-${C.reset}`;
 
   const title = ` ${C.bold}GEMINI PILOT HUD${C.reset} `;
   const sessionLine = `  Session   ${C.dim}${state.sessionId}${C.reset}`;
@@ -146,8 +148,8 @@ export function renderHudFull(state: HudState): string {
 
 /** Count bytes consumed by ANSI escape sequences in a string. */
 function countAnsi(s: string): number {
-  // eslint-disable-next-line no-control-regex
-  const stripped = s.replace(/\x1b\[[0-9;]*m/g, "");
+  const ansiPattern = "\\u001B\\[[0-9;]*m";
+  const stripped = s.replace(new RegExp(ansiPattern, "g"), "");
   return s.length - stripped.length;
 }
 

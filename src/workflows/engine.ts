@@ -8,11 +8,11 @@
  * @module workflows/engine
  */
 
-import * as path from "node:path";
 import * as fs from "node:fs";
+import * as path from "node:path";
 import { z } from "zod";
-import { parseMarkdownWithFrontmatter } from "../utils/markdown.js";
 import { createLogger } from "../utils/logger.js";
+import { parseMarkdownWithFrontmatter } from "../utils/markdown.js";
 
 const log = createLogger("workflows");
 
@@ -54,10 +54,10 @@ export interface WorkflowDefinition {
 function parseWorkflowSteps(body: string): WorkflowStep[] {
   const steps: WorkflowStep[] = [];
   const stepRegex = /### \d+\.\s+.+\n([\s\S]*?)(?=### \d+\.|$)/g;
-  let match: RegExpExecArray | null;
+  let match = stepRegex.exec(body);
 
-  while ((match = stepRegex.exec(body)) !== null) {
-    const content = match[1]!;
+  while (match !== null) {
+    const content = match[1] ?? "";
     const agent = content.match(/\*\*agent\*\*:\s*([\w-]+)/)?.[1] ?? "executor";
     const action = content.match(/\*\*action\*\*:\s*(.+)/)?.[1] ?? "";
     const output = content.match(/\*\*output\*\*:\s*(.+)/)?.[1] ?? "";
@@ -69,8 +69,9 @@ function parseWorkflowSteps(body: string): WorkflowStep[] {
       action: action.trim(),
       output: output.trim(),
       gate: gate.trim(),
-      loop_to: loopMatch ? parseInt(loopMatch[1]!, 10) : undefined,
+      loop_to: loopMatch?.[1] ? parseInt(loopMatch[1], 10) : undefined,
     });
+    match = stepRegex.exec(body);
   }
 
   return steps;
@@ -79,7 +80,9 @@ function parseWorkflowSteps(body: string): WorkflowStep[] {
 /**
  * Load a workflow from a markdown file.
  */
-export function loadWorkflowFile(filePath: string): WorkflowDefinition | undefined {
+export function loadWorkflowFile(
+  filePath: string,
+): WorkflowDefinition | undefined {
   try {
     const content = fs.readFileSync(filePath, "utf-8");
     const parsed = parseMarkdownWithFrontmatter<WorkflowFrontmatter>(content);

@@ -36,13 +36,13 @@ export function parseMarkdownWithFrontmatter<T = Record<string, unknown>>(
   const [, yamlStr, body] = match;
   let frontmatter: T;
   try {
-    frontmatter = YAML.parse(yamlStr!) as T;
+    frontmatter = YAML.parse(yamlStr ?? "") as T;
   } catch {
     frontmatter = {} as T;
   }
 
   return {
     frontmatter,
-    body: body!.trim(),
+    body: body?.trim(),
   };
 }

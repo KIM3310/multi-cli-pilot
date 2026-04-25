@@ -105,7 +105,7 @@ export const ERROR_CODES = {
   GP_031: {
     code: "GP_031",
     message: "Empty prompt provided",
-    hint: "Provide a non-empty prompt string. Usage: gp ask \"your question here\"",
+    hint: 'Provide a non-empty prompt string. Usage: gp ask "your question here"',
   },
   GP_032: {
     code: "GP_032",

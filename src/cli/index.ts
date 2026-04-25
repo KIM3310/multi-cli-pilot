@@ -6,39 +6,50 @@
  * @module cli
  */
 
-import * as fs from "node:fs";
 import { execSync } from "node:child_process";
+import * as fs from "node:fs";
 import { Command } from "commander";
-import { loadConfig, validateConfig, loadAndValidateConfigFile } from "../config/index.js";
-import { createPromptRegistry } from "../prompts/index.js";
-import { buildAgentRegistry } from "../agents/index.js";
-import { createWorkflowRegistry } from "../workflows/index.js";
-import { runWorkflow } from "../workflows/runner.js";
+import { type AgentDefinition, buildAgentRegistry } from "../agents/index.js";
+import { printBenchmarkTable, runBenchmark } from "../benchmark/index.js";
 import {
-  launchSession,
+  loadAndValidateConfigFile,
+  loadConfig,
+  validateConfig,
+} from "../config/index.js";
+import type { ApprovalMode, ModelTier } from "../config/schema.js";
+import { formatError } from "../errors/index.js";
+import {
   executePrompt,
+  launchSession,
   printDryRun,
   resolveModel,
-  buildGeminiArgs,
 } from "../harness/index.js";
-import { launchTeam, isTmuxAvailable } from "../team/index.js";
-import { StateManager } from "../state/index.js";
-import { startMcpServer } from "../mcp/index.js";
-import { renderHud, renderHudFull, type HudState } from "../hud/index.js";
-import { findProjectRoot, ensureDir, getStateDir, writeJsonFile, getPackageVersion } from "../utils/fs.js";
-import { setLogLevel } from "../utils/logger.js";
-import { formatError } from "../errors/index.js";
-import { getPluginDirs, ensurePluginDirs } from "../plugins/index.js";
-import { runBenchmark, printBenchmarkTable } from "../benchmark/index.js";
+import { type HudState, renderHud, renderHudFull } from "../hud/index.js";
 import { applyTemplate, TEMPLATE_NAMES } from "../init/index.js";
-import { runToolBenchmark, formatBenchmarkTable as formatToolBenchmarkTable } from "../tool-reliability/index.js";
+import { startMcpServer } from "../mcp/index.js";
+import { ensurePluginDirs, getPluginDirs } from "../plugins/index.js";
+import { createPromptRegistry } from "../prompts/index.js";
+import { StateManager } from "../state/index.js";
+import { isTmuxAvailable, launchTeam } from "../team/index.js";
 import {
-  runToolBench,
-  runToolBenchComparison,
   isToolCallingPromptAvailable,
   printToolBenchTable,
+  runToolBenchComparison,
 } from "../tool-bench/index.js";
-import type { ModelTier, ApprovalMode } from "../config/schema.js";
+import {
+  formatBenchmarkTable as formatToolBenchmarkTable,
+  runToolBenchmark,
+} from "../tool-reliability/index.js";
+import {
+  ensureDir,
+  findProjectRoot,
+  getPackageVersion,
+  getStateDir,
+  writeJsonFile,
+} from "../utils/fs.js";
+import { setLogLevel } from "../utils/logger.js";
+import { createWorkflowRegistry } from "../workflows/index.js";
+import { runWorkflow } from "../workflows/runner.js";
 
 const program = new Command();
 
@@ -130,7 +141,7 @@ program
 
     const approvalMode = opts.approvalMode as ApprovalMode;
 
-    let agent;
+    let agent: AgentDefinition | undefined;
     if (opts.agent) {
       const prompts = createPromptRegistry();
       const agents = buildAgentRegistry(
@@ -163,7 +174,7 @@ program
     const config = loadConfig();
     const workerCount = parseInt(count, 10);
 
-    if (isNaN(workerCount) || workerCount < 1 || workerCount > 8) {
+    if (Number.isNaN(workerCount) || workerCount < 1 || workerCount > 8) {
       console.error(formatError("GP_041"));
       process.exit(1);
     }
@@ -198,7 +209,12 @@ program
       process.exit(1);
     }
     const config = loadConfig();
-    const result = executePrompt(config, prompt, opts.tier as ModelTier, opts.dryRun ?? false);
+    const result = executePrompt(
+      config,
+      prompt,
+      opts.tier as ModelTier,
+      opts.dryRun ?? false,
+    );
     console.log(result);
   });
 
@@ -224,8 +240,12 @@ promptsCmd
     for (const p of prompts) {
       const model = p.frontmatter.model.padEnd(20);
       const effort = p.frontmatter.reasoning_effort;
-      const source = p.filePath.includes(".gemini-pilot") ? "[custom]" : "[built-in]";
-      console.log(`  ${p.frontmatter.name.padEnd(20)} ${model} [${effort}] ${source}`);
+      const source = p.filePath.includes(".gemini-pilot")
+        ? "[custom]"
+        : "[built-in]";
+      console.log(
+        `  ${p.frontmatter.name.padEnd(20)} ${model} [${effort}] ${source}`,
+      );
       console.log(`    ${p.frontmatter.description}\n`);
     }
   });
@@ -274,8 +294,12 @@ workflowsCmd
     for (const w of workflows) {
       const steps = w.steps.length;
       const policy = w.frontmatter.execution_policy;
-      const source = w.filePath.includes(".gemini-pilot") ? "[custom]" : "[built-in]";
-      console.log(`  ${w.frontmatter.name.padEnd(18)} ${steps} steps  [max_iter=${policy.max_iterations}] ${source}`);
+      const source = w.filePath.includes(".gemini-pilot")
+        ? "[custom]"
+        : "[built-in]";
+      console.log(
+        `  ${w.frontmatter.name.padEnd(18)} ${steps} steps  [max_iter=${policy.max_iterations}] ${source}`,
+      );
       console.log(`    ${w.frontmatter.description}`);
       if (w.frontmatter.triggers.length > 0) {
         console.log(`    Triggers: ${w.frontmatter.triggers.join(", ")}`);
@@ -300,9 +324,15 @@ workflowsCmd
 
     console.log(`\n  Name: ${workflow.frontmatter.name}`);
     console.log(`  Description: ${workflow.frontmatter.description}`);
-    console.log(`  Triggers: ${workflow.frontmatter.triggers.join(", ") || "none"}`);
-    console.log(`  Max Iterations: ${workflow.frontmatter.execution_policy.max_iterations}`);
-    console.log(`  Halt on Failure: ${workflow.frontmatter.execution_policy.halt_on_failure}`);
+    console.log(
+      `  Triggers: ${workflow.frontmatter.triggers.join(", ") || "none"}`,
+    );
+    console.log(
+      `  Max Iterations: ${workflow.frontmatter.execution_policy.max_iterations}`,
+    );
+    console.log(
+      `  Halt on Failure: ${workflow.frontmatter.execution_policy.halt_on_failure}`,
+    );
     console.log(`  File: ${workflow.filePath}`);
     console.log(`\n  Steps (${workflow.steps.length}):\n`);
     workflow.steps.forEach((step, i) => {
@@ -343,7 +373,7 @@ program
 
     // Check Node.js version
     const nodeVersion = process.version;
-    const nodeMajor = parseInt(nodeVersion.slice(1).split(".")[0]!, 10);
+    const nodeMajor = parseInt(nodeVersion.slice(1).split(".")[0] ?? "0", 10);
     const nodeOk = nodeMajor >= 20;
     console.log(
       `  ${nodeOk ? "OK" : "FAIL"}  Node.js ${nodeVersion} ${nodeOk ? "" : "(>= 20 required)"}`,
@@ -355,7 +385,8 @@ program
     // Check Gemini CLI
     let geminiOk = false;
     try {
-      const checkCmd = process.platform === "win32" ? "where gemini" : "which gemini";
+      const checkCmd =
+        process.platform === "win32" ? "where gemini" : "which gemini";
       execSync(checkCmd, { stdio: "pipe" });
       geminiOk = true;
     } catch {
@@ -393,13 +424,17 @@ program
     const prompts = createPromptRegistry([pluginDirs.prompts]);
     const builtinCount = createPromptRegistry().size;
     const customCount = prompts.size - builtinCount;
-    console.log(`  OK  Prompts: ${prompts.size} loaded (${builtinCount} built-in, ${customCount} custom)`);
+    console.log(
+      `  OK  Prompts: ${prompts.size} loaded (${builtinCount} built-in, ${customCount} custom)`,
+    );
 
     // Check workflows (including plugins)
     const workflows = createWorkflowRegistry([pluginDirs.workflows]);
     const builtinWfCount = createWorkflowRegistry().size;
     const customWfCount = workflows.size - builtinWfCount;
-    console.log(`  OK  Workflows: ${workflows.size} loaded (${builtinWfCount} built-in, ${customWfCount} custom)`);
+    console.log(
+      `  OK  Workflows: ${workflows.size} loaded (${builtinWfCount} built-in, ${customWfCount} custom)`,
+    );
 
     console.log();
   });
@@ -425,7 +460,9 @@ configCmd
     const fileResult = loadAndValidateConfigFile();
     if (!fileResult.valid) {
       console.error(formatError("GP_001"));
-      fileResult.errors?.forEach((e) => console.error(`  - ${e}`));
+      fileResult.errors?.forEach((e) => {
+        console.error(`  - ${e}`);
+      });
       process.exit(1);
     }
 
@@ -436,7 +473,9 @@ configCmd
       console.log("Configuration is valid.");
     } else {
       console.error(formatError("GP_002"));
-      result.errors?.forEach((e) => console.error(`  - ${e}`));
+      result.errors?.forEach((e) => {
+        console.error(`  - ${e}`);
+      });
       process.exit(1);
     }
   });
@@ -478,7 +517,8 @@ program
     if (recentCompleted.length > 0) {
       console.log(`\n  Recent Sessions (last ${recentCompleted.length}):`);
       for (const s of recentCompleted) {
-        const m = s.metrics!;
+        const m = s.metrics;
+        if (!m) continue;
         console.log(
           `    ${s.id}  status=${s.status}  model=${m.modelUsed ?? "unknown"}  elapsed=${m.elapsedMs}ms  prompts=${m.promptsSent}`,
         );
@@ -501,16 +541,16 @@ program
       );
     }
 
-    console.log(
-      `\n  Total Sessions: ${sessions.length}`,
-    );
+    console.log(`\n  Total Sessions: ${sessions.length}`);
     console.log();
   });
 
 // --- gp benchmark ---
 program
   .command("benchmark <prompt>")
-  .description("Run the same prompt across all model tiers and compare response time")
+  .description(
+    "Run the same prompt across all model tiers and compare response time",
+  )
   .option("--dry-run", "Show what would be executed without running")
   .action((prompt: string, opts) => {
     if (!prompt.trim()) {
@@ -546,9 +586,15 @@ program
         estimatedTokens: active?.metrics?.estimatedTokens ?? 0,
         elapsedMs: active?.metrics?.elapsedMs ?? 0,
         activeWorkflow: workflowState?.workflowName ?? null,
-        workflowStep: workflowState ? `${workflowState.currentStep + 1}/${workflowState.totalSteps}` : null,
+        workflowStep: workflowState
+          ? `${workflowState.currentStep + 1}/${workflowState.totalSteps}`
+          : null,
         teamWorkers: teamState?.workerCount ?? 0,
-        status: active ? "running" : workflowState?.status === "failed" ? "error" : "idle",
+        status: active
+          ? "running"
+          : workflowState?.status === "failed"
+            ? "error"
+            : "idle",
       };
 
       if (opts.compact) {
@@ -576,8 +622,13 @@ program
 // --- gp tool-bench ---
 program
   .command("tool-bench")
-  .description("Run tool-calling benchmarks (reliability + prompt optimization)")
-  .option("--prompt-only", "Only run the tool-calling prompt benchmark (20 cases)")
+  .description(
+    "Run tool-calling benchmarks (reliability + prompt optimization)",
+  )
+  .option(
+    "--prompt-only",
+    "Only run the tool-calling prompt benchmark (20 cases)",
+  )
   .option("--reliability-only", "Only run the tool reliability benchmark")
   .action((opts) => {
     if (!opts.promptOnly) {
@@ -590,12 +641,19 @@ program
       console.log("\n  Tool-Calling Prompt Benchmark (20 cases)\n");
 
       const promptAvailable = isToolCallingPromptAvailable();
-      console.log(`  Tool-calling prompt: ${promptAvailable ? "loaded" : "NOT FOUND"}`);
+      console.log(
+        `  Tool-calling prompt: ${promptAvailable ? "loaded" : "NOT FOUND"}`,
+      );
 
       const comparison = runToolBenchComparison();
-      printToolBenchTable(comparison.withoutPrompt, "Without Tool-Calling Prompt");
+      printToolBenchTable(
+        comparison.withoutPrompt,
+        "Without Tool-Calling Prompt",
+      );
       printToolBenchTable(comparison.withPrompt, "With Tool-Calling Prompt");
-      console.log(`  Improvement: ${comparison.improvementPct >= 0 ? "+" : ""}${comparison.improvementPct.toFixed(1)}%\n`);
+      console.log(
+        `  Improvement: ${comparison.improvementPct >= 0 ? "+" : ""}${comparison.improvementPct.toFixed(1)}%\n`,
+      );
     }
   });
 

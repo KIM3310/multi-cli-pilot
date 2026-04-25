@@ -9,15 +9,23 @@
  */
 
 import { z } from "zod";
-import { parseToolCalls, type ToolDefinition } from "./parser.js";
 import type { ToolCall } from "./parser.js";
+import { parseToolCalls, type ToolDefinition } from "./parser.js";
 
 /** A single benchmark test case. */
 export interface BenchmarkCase {
   /** Unique identifier. */
   id: string;
   /** Category for grouping results. */
-  category: "simple" | "nested" | "multi-tool" | "missing-params" | "wrong-types" | "malformed" | "xml" | "markdown";
+  category:
+    | "simple"
+    | "nested"
+    | "multi-tool"
+    | "missing-params"
+    | "wrong-types"
+    | "malformed"
+    | "xml"
+    | "markdown";
   /** Description of what this case tests. */
   description: string;
   /** Raw model output text. */
@@ -53,7 +61,10 @@ export interface ToolBenchmarkResult {
   /** Improvement in percentage points. */
   improvement: number;
   /** Per-category breakdown. */
-  categories: Record<string, { baseline: number; middleware: number; total: number }>;
+  categories: Record<
+    string,
+    { baseline: number; middleware: number; total: number }
+  >;
 }
 
 // ---- Tool definitions used across test cases ----
@@ -124,15 +135,22 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "simple-02",
     category: "simple",
     description: "Tool call with optional param",
-    modelOutput: '{"name": "get_weather", "arguments": {"location": "Tokyo", "units": "celsius"}}',
+    modelOutput:
+      '{"name": "get_weather", "arguments": {"location": "Tokyo", "units": "celsius"}}',
     tools: [weatherTool],
-    expected: [{ name: "get_weather", arguments: { location: "Tokyo", units: "celsius" } }],
+    expected: [
+      {
+        name: "get_weather",
+        arguments: { location: "Tokyo", units: "celsius" },
+      },
+    ],
   },
   {
     id: "simple-03",
     category: "simple",
     description: "Tool call with surrounding text",
-    modelOutput: 'I will check the weather for you.\n{"name": "get_weather", "arguments": {"location": "Paris"}}\nLet me know if you need anything else.',
+    modelOutput:
+      'I will check the weather for you.\n{"name": "get_weather", "arguments": {"location": "Paris"}}\nLet me know if you need anything else.',
     tools: [weatherTool],
     expected: [{ name: "get_weather", arguments: { location: "Paris" } }],
   },
@@ -142,17 +160,34 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "nested-01",
     category: "nested",
     description: "Tool call with nested array",
-    modelOutput: '{"name": "send_message", "arguments": {"to": "alice@example.com", "subject": "Hello", "body": "Hi there!", "tags": ["urgent", "follow-up"]}}',
+    modelOutput:
+      '{"name": "send_message", "arguments": {"to": "alice@example.com", "subject": "Hello", "body": "Hi there!", "tags": ["urgent", "follow-up"]}}',
     tools: [sendMessageTool],
-    expected: [{ name: "send_message", arguments: { to: "alice@example.com", subject: "Hello", body: "Hi there!", tags: ["urgent", "follow-up"] } }],
+    expected: [
+      {
+        name: "send_message",
+        arguments: {
+          to: "alice@example.com",
+          subject: "Hello",
+          body: "Hi there!",
+          tags: ["urgent", "follow-up"],
+        },
+      },
+    ],
   },
   {
     id: "nested-02",
     category: "nested",
     description: "Nested with optional fields omitted",
-    modelOutput: '{"name": "send_message", "arguments": {"to": "bob@example.com", "subject": "Test", "body": "Testing"}}',
+    modelOutput:
+      '{"name": "send_message", "arguments": {"to": "bob@example.com", "subject": "Test", "body": "Testing"}}',
     tools: [sendMessageTool],
-    expected: [{ name: "send_message", arguments: { to: "bob@example.com", subject: "Test", body: "Testing" } }],
+    expected: [
+      {
+        name: "send_message",
+        arguments: { to: "bob@example.com", subject: "Test", body: "Testing" },
+      },
+    ],
   },
 
   // --- multi-tool ---
@@ -160,7 +195,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "multi-01",
     category: "multi-tool",
     description: "Array of two tool calls",
-    modelOutput: '[{"name": "get_weather", "arguments": {"location": "London"}}, {"name": "search", "arguments": {"query": "London restaurants"}}]',
+    modelOutput:
+      '[{"name": "get_weather", "arguments": {"location": "London"}}, {"name": "search", "arguments": {"query": "London restaurants"}}]',
     tools: [weatherTool, searchTool],
     expected: [
       { name: "get_weather", arguments: { location: "London" } },
@@ -171,7 +207,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "multi-02",
     category: "multi-tool",
     description: "Two tool calls in markdown blocks",
-    modelOutput: 'First, get weather:\n```json\n{"name": "get_weather", "arguments": {"location": "NYC"}}\n```\nThen search:\n```json\n{"name": "search", "arguments": {"query": "NYC events"}}\n```',
+    modelOutput:
+      'First, get weather:\n```json\n{"name": "get_weather", "arguments": {"location": "NYC"}}\n```\nThen search:\n```json\n{"name": "search", "arguments": {"query": "NYC events"}}\n```',
     tools: [weatherTool, searchTool],
     expected: [
       { name: "get_weather", arguments: { location: "NYC" } },
@@ -194,39 +231,66 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "types-01",
     category: "wrong-types",
     description: "String number needs coercion to number",
-    modelOutput: '{"name": "search", "arguments": {"query": "restaurants", "maxResults": "10"}}',
+    modelOutput:
+      '{"name": "search", "arguments": {"query": "restaurants", "maxResults": "10"}}',
     tools: [searchTool],
-    expected: [{ name: "search", arguments: { query: "restaurants", maxResults: 10 } }],
+    expected: [
+      { name: "search", arguments: { query: "restaurants", maxResults: 10 } },
+    ],
   },
   {
     id: "types-02",
     category: "wrong-types",
     description: "String boolean needs coercion",
-    modelOutput: '{"name": "create_file", "arguments": {"path": "/tmp/test.txt", "content": "hello", "overwrite": "true"}}',
+    modelOutput:
+      '{"name": "create_file", "arguments": {"path": "/tmp/test.txt", "content": "hello", "overwrite": "true"}}',
     tools: [createFileTool],
-    expected: [{ name: "create_file", arguments: { path: "/tmp/test.txt", content: "hello", overwrite: true } }],
+    expected: [
+      {
+        name: "create_file",
+        arguments: { path: "/tmp/test.txt", content: "hello", overwrite: true },
+      },
+    ],
   },
   {
     id: "types-03",
     category: "wrong-types",
     description: "Single string needs array wrapping",
-    modelOutput: '{"name": "send_message", "arguments": {"to": "x@y.com", "subject": "Hi", "body": "Hey", "tags": "urgent"}}',
+    modelOutput:
+      '{"name": "send_message", "arguments": {"to": "x@y.com", "subject": "Hi", "body": "Hey", "tags": "urgent"}}',
     tools: [sendMessageTool],
-    expected: [{ name: "send_message", arguments: { to: "x@y.com", subject: "Hi", body: "Hey", tags: ["urgent"] } }],
+    expected: [
+      {
+        name: "send_message",
+        arguments: {
+          to: "x@y.com",
+          subject: "Hi",
+          body: "Hey",
+          tags: ["urgent"],
+        },
+      },
+    ],
   },
   {
     id: "types-04",
     category: "wrong-types",
     description: "Priority as string number",
-    modelOutput: '{"name": "send_message", "arguments": {"to": "z@w.com", "subject": "A", "body": "B", "priority": "5"}}',
+    modelOutput:
+      '{"name": "send_message", "arguments": {"to": "z@w.com", "subject": "A", "body": "B", "priority": "5"}}',
     tools: [sendMessageTool],
-    expected: [{ name: "send_message", arguments: { to: "z@w.com", subject: "A", body: "B", priority: 5 } }],
+    expected: [
+      {
+        name: "send_message",
+        arguments: { to: "z@w.com", subject: "A", body: "B", priority: 5 },
+      },
+    ],
   },
   {
     id: "types-05",
     category: "wrong-types",
     description: "Snake_case key needs camelCase normalization",
-    modelOutput: '{"name": "search", "arguments": {"query": "test", "max_results": "5"}}',
+    modelOutput:
+      '{"name": "search", "arguments": {"query": "test", "max_results": "5"}}',
     tools: [searchTool],
     expected: [{ name: "search", arguments: { query: "test", maxResults: 5 } }],
   },
@@ -236,7 +300,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "malformed-01",
     category: "malformed",
     description: "Trailing comma in object",
-    modelOutput: '{"name": "get_weather", "arguments": {"location": "Berlin",}}',
+    modelOutput:
+      '{"name": "get_weather", "arguments": {"location": "Berlin",}}',
     tools: [weatherTool],
     expected: [{ name: "get_weather", arguments: { location: "Berlin" } }],
   },
@@ -260,7 +325,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "malformed-04",
     category: "malformed",
     description: "JSON with comments",
-    modelOutput: '{\n  // Tool call\n  "name": "get_weather",\n  "arguments": {\n    "location": "Oslo" /* capital */\n  }\n}',
+    modelOutput:
+      '{\n  // Tool call\n  "name": "get_weather",\n  "arguments": {\n    "location": "Oslo" /* capital */\n  }\n}',
     tools: [weatherTool],
     expected: [{ name: "get_weather", arguments: { location: "Oslo" } }],
   },
@@ -278,7 +344,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "xml-01",
     category: "xml",
     description: "XML tool call format",
-    modelOutput: '<tool_call><name>get_weather</name><arguments>{"location": "Dublin"}</arguments></tool_call>',
+    modelOutput:
+      '<tool_call><name>get_weather</name><arguments>{"location": "Dublin"}</arguments></tool_call>',
     tools: [weatherTool],
     expected: [{ name: "get_weather", arguments: { location: "Dublin" } }],
   },
@@ -286,7 +353,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "xml-02",
     category: "xml",
     description: "XML with surrounding text",
-    modelOutput: 'Let me look that up for you.\n<tool_call>\n  <name>search</name>\n  <arguments>{"query": "best cafes"}</arguments>\n</tool_call>\nHere are the results:',
+    modelOutput:
+      'Let me look that up for you.\n<tool_call>\n  <name>search</name>\n  <arguments>{"query": "best cafes"}</arguments>\n</tool_call>\nHere are the results:',
     tools: [searchTool],
     expected: [{ name: "search", arguments: { query: "best cafes" } }],
   },
@@ -296,7 +364,8 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "md-01",
     category: "markdown",
     description: "Markdown code fence wrapping",
-    modelOutput: '```json\n{"name": "get_weather", "arguments": {"location": "Seoul"}}\n```',
+    modelOutput:
+      '```json\n{"name": "get_weather", "arguments": {"location": "Seoul"}}\n```',
     tools: [weatherTool],
     expected: [{ name: "get_weather", arguments: { location: "Seoul" } }],
   },
@@ -304,9 +373,15 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     id: "md-02",
     category: "markdown",
     description: "Markdown with explanation text",
-    modelOutput: 'I\'ll check the weather:\n\n```json\n{"name": "get_weather", "arguments": {"location": "Busan", "units": "celsius"}}\n```\n\nDone!',
+    modelOutput:
+      'I\'ll check the weather:\n\n```json\n{"name": "get_weather", "arguments": {"location": "Busan", "units": "celsius"}}\n```\n\nDone!',
     tools: [weatherTool],
-    expected: [{ name: "get_weather", arguments: { location: "Busan", units: "celsius" } }],
+    expected: [
+      {
+        name: "get_weather",
+        arguments: { location: "Busan", units: "celsius" },
+      },
+    ],
   },
 ];
 
@@ -316,10 +391,12 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
 function toolCallsMatch(actual: ToolCall[], expected: ToolCall[]): boolean {
   if (actual.length !== expected.length) return false;
   for (let i = 0; i < actual.length; i++) {
-    const a = actual[i]!;
-    const e = expected[i]!;
+    const a = actual[i];
+    const e = expected[i];
+    if (!a || !e) return false;
     if (a.name !== e.name) return false;
-    if (JSON.stringify(a.arguments) !== JSON.stringify(e.arguments)) return false;
+    if (JSON.stringify(a.arguments) !== JSON.stringify(e.arguments))
+      return false;
   }
   return true;
 }
@@ -327,7 +404,10 @@ function toolCallsMatch(actual: ToolCall[], expected: ToolCall[]): boolean {
 /**
  * Attempt baseline parsing: strict JSON.parse only, no coercion.
  */
-function baselineParse(modelOutput: string, tools: ToolDefinition[]): { calls: ToolCall[]; errors: string[] } {
+function baselineParse(
+  modelOutput: string,
+  _tools: ToolDefinition[],
+): { calls: ToolCall[]; errors: string[] } {
   try {
     const parsed = JSON.parse(modelOutput);
     const calls: ToolCall[] = [];
@@ -339,16 +419,24 @@ function baselineParse(modelOutput: string, tools: ToolDefinition[]): { calls: T
     }
     return { calls, errors: [] };
   } catch (err) {
-    return { calls: [], errors: [err instanceof Error ? err.message : String(err)] };
+    return {
+      calls: [],
+      errors: [err instanceof Error ? err.message : String(err)],
+    };
   }
 }
 
 /**
  * Run the full benchmark suite.
  */
-export function runToolBenchmark(cases: BenchmarkCase[] = BENCHMARK_CASES): ToolBenchmarkResult {
+export function runToolBenchmark(
+  cases: BenchmarkCase[] = BENCHMARK_CASES,
+): ToolBenchmarkResult {
   const results: ToolReliabilityCaseResult[] = [];
-  const categories: Record<string, { baseline: number; middleware: number; total: number }> = {};
+  const categories: Record<
+    string,
+    { baseline: number; middleware: number; total: number }
+  > = {};
 
   for (const tc of cases) {
     // Baseline: strict JSON.parse
@@ -369,12 +457,14 @@ export function runToolBenchmark(cases: BenchmarkCase[] = BENCHMARK_CASES): Tool
     });
 
     // Update category stats
-    if (!categories[tc.category]) {
-      categories[tc.category] = { baseline: 0, middleware: 0, total: 0 };
+    let categoryStats = categories[tc.category];
+    if (!categoryStats) {
+      categoryStats = { baseline: 0, middleware: 0, total: 0 };
+      categories[tc.category] = categoryStats;
     }
-    categories[tc.category]!.total++;
-    if (baselinePass) categories[tc.category]!.baseline++;
-    if (middlewarePass) categories[tc.category]!.middleware++;
+    categoryStats.total++;
+    if (baselinePass) categoryStats.baseline++;
+    if (middlewarePass) categoryStats.middleware++;
   }
 
   const total = results.length;
@@ -403,27 +493,40 @@ export function formatBenchmarkTable(result: ToolBenchmarkResult): string {
 
   // Per-case results
   lines.push("  Case Results:");
-  lines.push(`  ${"ID".padEnd(16)} ${"Category".padEnd(16)} ${"Baseline".padEnd(10)} ${"Middleware".padEnd(10)} ${"Description"}`);
-  lines.push(`  ${"-".repeat(16)} ${"-".repeat(16)} ${"-".repeat(10)} ${"-".repeat(10)} ${"-".repeat(30)}`);
+  lines.push(
+    `  ${"ID".padEnd(16)} ${"Category".padEnd(16)} ${"Baseline".padEnd(10)} ${"Middleware".padEnd(10)} ${"Description"}`,
+  );
+  lines.push(
+    `  ${"-".repeat(16)} ${"-".repeat(16)} ${"-".repeat(10)} ${"-".repeat(10)} ${"-".repeat(30)}`,
+  );
 
   for (const c of result.cases) {
     const bl = c.baselinePass ? "PASS" : "FAIL";
     const mw = c.middlewarePass ? "PASS" : "FAIL";
-    const desc = result.cases.find((x) => x.id === c.id)?.category ?? "";
-    lines.push(`  ${c.id.padEnd(16)} ${c.category.padEnd(16)} ${bl.padEnd(10)} ${mw.padEnd(10)}`);
+    const _desc = result.cases.find((x) => x.id === c.id)?.category ?? "";
+    lines.push(
+      `  ${c.id.padEnd(16)} ${c.category.padEnd(16)} ${bl.padEnd(10)} ${mw.padEnd(10)}`,
+    );
   }
 
   lines.push("");
 
   // Category summary
   lines.push("  Category Summary:");
-  lines.push(`  ${"Category".padEnd(18)} ${"Baseline".padEnd(14)} ${"Middleware".padEnd(14)} ${"Delta"}`);
-  lines.push(`  ${"-".repeat(18)} ${"-".repeat(14)} ${"-".repeat(14)} ${"-".repeat(10)}`);
+  lines.push(
+    `  ${"Category".padEnd(18)} ${"Baseline".padEnd(14)} ${"Middleware".padEnd(14)} ${"Delta"}`,
+  );
+  lines.push(
+    `  ${"-".repeat(18)} ${"-".repeat(14)} ${"-".repeat(14)} ${"-".repeat(10)}`,
+  );
 
   for (const [cat, stats] of Object.entries(result.categories)) {
     const blPct = ((stats.baseline / stats.total) * 100).toFixed(0);
     const mwPct = ((stats.middleware / stats.total) * 100).toFixed(0);
-    const delta = (((stats.middleware - stats.baseline) / stats.total) * 100).toFixed(0);
+    const delta = (
+      ((stats.middleware - stats.baseline) / stats.total) *
+      100
+    ).toFixed(0);
     lines.push(
       `  ${cat.padEnd(18)} ${`${stats.baseline}/${stats.total} (${blPct}%)`.padEnd(14)} ${`${stats.middleware}/${stats.total} (${mwPct}%)`.padEnd(14)} +${delta}%`,
     );
@@ -433,9 +536,15 @@ export function formatBenchmarkTable(result: ToolBenchmarkResult): string {
 
   // Overall
   lines.push("  Overall:");
-  lines.push(`    Baseline success rate:   ${(result.baselineRate * 100).toFixed(1)}%`);
-  lines.push(`    Middleware success rate:  ${(result.middlewareRate * 100).toFixed(1)}%`);
-  lines.push(`    Improvement:             +${result.improvement.toFixed(1)} percentage points`);
+  lines.push(
+    `    Baseline success rate:   ${(result.baselineRate * 100).toFixed(1)}%`,
+  );
+  lines.push(
+    `    Middleware success rate:  ${(result.middlewareRate * 100).toFixed(1)}%`,
+  );
+  lines.push(
+    `    Improvement:             +${result.improvement.toFixed(1)} percentage points`,
+  );
   lines.push("");
 
   return lines.join("\n");

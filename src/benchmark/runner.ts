@@ -7,7 +7,12 @@
 
 import { execFileSync } from "node:child_process";
 import type { GeminiPilotConfig, ModelTier } from "../config/schema.js";
-import { resolveModel, buildGeminiArgs, printDryRun, ensureGeminiInstalled } from "../harness/session.js";
+import {
+  buildGeminiArgs,
+  ensureGeminiInstalled,
+  printDryRun,
+  resolveModel,
+} from "../harness/session.js";
 import { createLogger } from "../utils/logger.js";
 
 const log = createLogger("benchmark");
@@ -55,7 +60,9 @@ export function runBenchmark(
   const result: BenchmarkResult = { prompt, tiers: [] };
 
   console.log("\n  Gemini Pilot Benchmark\n");
-  console.log(`  Prompt: "${prompt.slice(0, 80)}${prompt.length > 80 ? "..." : ""}"\n`);
+  console.log(
+    `  Prompt: "${prompt.slice(0, 80)}${prompt.length > 80 ? "..." : ""}"\n`,
+  );
 
   if (dryRun) {
     for (const tier of BENCHMARK_TIERS) {
@@ -131,12 +138,16 @@ export function printBenchmarkTable(result: BenchmarkResult): void {
   console.log(
     `  ${"Tier".padEnd(12)} ${"Model".padEnd(24)} ${"Time".padEnd(10)} ${"Chars".padEnd(10)} ${"Status"}`,
   );
-  console.log(`  ${"---".padEnd(12)} ${"---".padEnd(24)} ${"---".padEnd(10)} ${"---".padEnd(10)} ${"---"}`);
+  console.log(
+    `  ${"---".padEnd(12)} ${"---".padEnd(24)} ${"---".padEnd(10)} ${"---".padEnd(10)} ${"---"}`,
+  );
 
   for (const t of result.tiers) {
     const time = t.success ? `${t.elapsedMs}ms` : "N/A";
     const chars = t.success ? String(t.responseLength) : "N/A";
-    const status = t.success ? "OK" : `FAIL: ${t.error?.slice(0, 30) ?? "unknown"}`;
+    const status = t.success
+      ? "OK"
+      : `FAIL: ${t.error?.slice(0, 30) ?? "unknown"}`;
     console.log(
       `  ${t.tier.padEnd(12)} ${t.model.padEnd(24)} ${time.padEnd(10)} ${chars.padEnd(10)} ${status}`,
     );
@@ -145,7 +156,11 @@ export function printBenchmarkTable(result: BenchmarkResult): void {
   // Show winner
   const successful = result.tiers.filter((t) => t.success);
   if (successful.length > 0) {
-    const fastest = successful.reduce((a, b) => (a.elapsedMs < b.elapsedMs ? a : b));
-    console.log(`\n  Fastest: ${fastest.tier} (${fastest.model}) at ${fastest.elapsedMs}ms\n`);
+    const fastest = successful.reduce((a, b) =>
+      a.elapsedMs < b.elapsedMs ? a : b,
+    );
+    console.log(
+      `\n  Fastest: ${fastest.tier} (${fastest.model}) at ${fastest.elapsedMs}ms\n`,
+    );
   }
 }
