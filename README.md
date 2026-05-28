@@ -37,6 +37,10 @@ A multi-agent CLI harness that shows how complex coding work can be coordinated 
 - **Verification:** Run `npm run verify`; it covers lint, typecheck, tests, and build.
 - **Commercial read:** Package it as a developer productivity layer for multi-provider AI coding workflows.
 
+## Commercialization Playbook
+
+- [Monetization and GTM playbook](docs/monetization-playbook.md) maps the repository to buyer segments, offer ladder, pricing hypotheses, proof gates, and risk boundaries.
+
 ## Why
 
 Coding-agent CLIs ship fast but each one ends up with its own agents,
