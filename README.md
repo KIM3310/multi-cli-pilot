@@ -18,6 +18,18 @@ workflows, prompts, hooks, MCP tools, and team primitives.
 > preserved as deprecated aliases — existing `gp` / `gemini-pilot`
 > commands continue to work.
 
+## Product and Review Surface
+
+A multi-agent CLI harness that shows how complex coding work can be coordinated without losing traceability.
+
+| Lens | Definition |
+|---|---|
+| Buyer or user | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
+| Commercial route | Sell as an internal workflow setup, team-agent playbook, or MCP-enabled orchestration starter. |
+| Review signal | Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface. |
+| Safety boundary | Agent output remains advisory and review-required; production repositories should keep human approval and CI gates. |
+| Fast proof | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
+
 ## Why
 
 Coding-agent CLIs ship fast but each one ends up with its own agents,
