@@ -30,6 +30,13 @@ A multi-agent CLI harness that shows how complex coding work can be coordinated 
 | Safety boundary | Agent output remains advisory and review-required; production repositories should keep human approval and CI gates. |
 | Fast proof | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
 
+## Reviewer Fast Path
+
+- **First minute:** Run a simple workflow, then inspect how provider switching and team coordination are represented.
+- **Local demo:** Run the installer or `npm install && npm run build`, then use the CLI examples under Quick Start.
+- **Verification:** Run `npm run verify`; it covers lint, typecheck, tests, and build.
+- **Commercial read:** Package it as a developer productivity layer for multi-provider AI coding workflows.
+
 ## Why
 
 Coding-agent CLIs ship fast but each one ends up with its own agents,
