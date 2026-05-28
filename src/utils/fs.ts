@@ -9,6 +9,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 /**
  * Ensure a directory exists, creating it recursively if needed.
@@ -97,7 +98,7 @@ export function findProjectRoot(startDir?: string): string {
 export function getPackageVersion(): string {
   try {
     // Walk up from this file to find the package root
-    let dir = path.dirname(new URL(import.meta.url).pathname);
+    let dir = path.dirname(fileURLToPath(import.meta.url));
     const root = path.parse(dir).root;
     while (dir !== root) {
       const pkgPath = path.join(dir, "package.json");

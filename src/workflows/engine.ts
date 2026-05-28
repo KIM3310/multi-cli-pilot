@@ -10,6 +10,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { createLogger } from "../utils/logger.js";
 import { parseMarkdownWithFrontmatter } from "../utils/markdown.js";
@@ -164,7 +165,7 @@ export class WorkflowRegistry {
  */
 export function getBuiltinWorkflowsDir(): string {
   return path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
+    path.dirname(fileURLToPath(import.meta.url)),
     "..",
     "..",
     "workflows",
