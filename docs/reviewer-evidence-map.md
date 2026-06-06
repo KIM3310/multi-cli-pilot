@@ -51,9 +51,9 @@ Use this page as the short path through the repository. It keeps the review grou
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Internal workflow setup | $2k-$8k setup |
-| Team-agent playbook | $10k-$35k team rollout |
-| MCP orchestration starter | $1k-$6k/month workflow maintenance |
+| Internal workflow setup | Scope after buyer intake |
+| Team-agent playbook | Scope after buyer intake |
+| MCP orchestration starter | Scope after buyer intake |
 
 ## Boundaries
 

@@ -12,7 +12,7 @@ This is the buyer-ready version of the repository. It turns the technical proof 
 | Buyer | Engineering teams and platform groups standardizing multiple coding-agent CLIs. |
 | Pain wedge | One orchestration harness for Gemini, Qwen, prompts, workflows, hooks, MCP, and team primitives. |
 | Front-door offer | Internal workflow setup |
-| Entry scope | $2k-$8k setup |
+| Entry scope | Scope after buyer intake |
 | Proof before pitch | npm run verify passes |
 | Next buyer action | Review one proof artifact, then choose diagnostic, workshop, pilot, support, or revival path. |
 
@@ -20,9 +20,9 @@ This is the buyer-ready version of the repository. It turns the technical proof 
 
 | Offer | Scope assumption | Buyer-facing scope |
 |---|---|---|
-| Internal workflow setup | $2k-$8k setup | Publish 5 workflow recipes |
-| Team-agent playbook | $10k-$35k team rollout | Create team rollout guide |
-| MCP orchestration starter | $1k-$6k/month workflow maintenance | Offer setup sprint |
+| Internal workflow setup | Scope after buyer intake | Publish 5 workflow recipes |
+| Team-agent playbook | Scope after buyer intake | Create team rollout guide |
+| MCP orchestration starter | Scope after buyer intake | Offer setup sprint |
 
 ## Close Path
 

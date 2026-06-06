@@ -50,8 +50,8 @@ This note specializes the repository for service launch. It combines product str
 ## Conversion Path
 
 - Free proof: runnable sample, benchmark, or package install.
-- Paid entry: Internal workflow setup ($2k-$8k setup) tied to one integration or reliability question.
-- Expansion: Team-agent playbook ($10k-$35k team rollout) and MCP orchestration starter ($1k-$6k/month workflow maintenance) after internal adoption starts.
+- Paid entry: Internal workflow setup (scope after buyer intake) tied to one integration or reliability question.
+- Expansion: Team-agent playbook (scope after buyer intake) and MCP orchestration starter (scope after buyer intake) after internal adoption starts.
 
 ## Scope Frame
 
