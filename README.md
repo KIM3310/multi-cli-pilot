@@ -1,3 +1,10 @@
+# Multi-CLI Pilot
+
+## Live Demo
+
+- [Open the public GitHub Pages demo](https://kim3310.github.io/multi-cli-pilot/)
+- Scope: credential-free, synthetic-data demo for reviewers and evaluators.
+
 ![CI](https://github.com/KIM3310/multi-cli-pilot/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
