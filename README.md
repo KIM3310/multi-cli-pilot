@@ -31,8 +31,8 @@ A multi-agent CLI harness that shows how complex coding work can be coordinated 
 
 | Lens | Definition |
 |---|---|
-| Buyer or user | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
-| Commercial route | Sell as an internal workflow setup, team-agent playbook, or MCP-enabled orchestration starter. |
+| Audience | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
+| Review path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
 | Review signal | Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface. |
 | Safety boundary | Agent output remains advisory and review-required; production repositories should keep human approval and CI gates. |
 | Fast proof | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
@@ -42,20 +42,16 @@ A multi-agent CLI harness that shows how complex coding work can be coordinated 
 - **First minute:** Run a simple workflow, then inspect how provider switching and team coordination are represented.
 - **Local demo:** Run the installer or `npm install && npm run build`, then use the CLI examples under Quick Start.
 - **Verification:** Run `npm run verify`; it covers lint, typecheck, tests, and build.
-- **Commercial read:** Package it as a developer productivity layer for multi-provider AI coding workflows.
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to buyer segments, offer ladder, proof gates, proof gates, and risk boundaries.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to review audiences, offer ladder, proof gates, proof gates, and risk boundaries.
 
 ## Review Notes
 
 - [Review guide](docs/reviewer-evidence-map.md) summarizes the project angle, first files to inspect, verification commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
-- [Service growth model](docs/service-growth-model.md) maps the project to an ethical service path, activation loop, scope logic, and growth experiments.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
-- [Conversion UX model](docs/conversion-ux-model.md) maps the buyer path, behavioral design, UI/UX direction, scope frame, and ethical conversion guardrails.
-- [Commercial offer](docs/commercial-offer.md) packages the repository into a buyer-ready offer ladder, proof gate, outreach angle, and close path.
 
 ## Why
 
@@ -259,7 +255,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the buyer, paid wedge, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the reviewer, trust boundary, trust boundary, operating checks, and service path for this repository.
 
 ## Service Architecture
 

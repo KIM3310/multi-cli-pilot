@@ -47,13 +47,13 @@ Use this page as the short path through the repository. It keeps the review grou
 - Installers work
 - Workflow examples are inspectable
 
-## Commercial Notes
+## Review Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Internal workflow setup | Scope after buyer intake |
-| Team-agent playbook | Scope after buyer intake |
-| MCP orchestration starter | Scope after buyer intake |
+| Internal workflow setup | Scope after reviewer intake |
+| Team-agent playbook | Scope after reviewer intake |
+| MCP orchestration starter | Scope after reviewer intake |
 
 ## Boundaries
 
