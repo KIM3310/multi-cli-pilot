@@ -13,23 +13,23 @@
 | Scenario | Primary Agent | Support Agents |
 |---|---|---|
 | New feature design | architect | planner, analyst |
-| Bug investigation | debugger | analyst, reviewer |
+| Bug investigation | debugger | analyst, architecture-reader |
 | Code implementation | executor | architect, test-engineer |
 | Performance issues | optimizer | analyst, debugger |
-| Security concerns | security-auditor | reviewer, architect |
-| Code quality | reviewer | refactorer, critic |
+| Security concerns | security-auditor | architecture-reader, architect |
+| Code quality | architecture-reader | refactorer, critic |
 | Test coverage | test-engineer | executor, debugger |
 | Documentation | documenter | architect, mentor |
 | UI/UX work | designer | architect, analyst |
 | Research tasks | scientist | analyst, mentor |
-| Refactoring | refactorer | reviewer, test-engineer |
-| Code critique | critic | reviewer, mentor |
+| Refactoring | refactorer | architecture-reader, test-engineer |
+| Code critique | critic | architecture-reader, mentor |
 | Knowledge transfer | mentor | documenter, architect |
 
 ### Model Routing
 
 - **gemini-3.1-pro**: Complex reasoning, architecture decisions, security analysis, multi-step planning
-- **gemini-3.1-flash**: Code generation, reviews, testing, documentation, standard implementation
+- **gemini-3.1-flash**: Code generation, implementation assessment, testing, documentation, standard implementation
 - **gemini-3.1-flash-lite**: Quick queries, formatting, simple lookups, status checks
 
 ## Workflow Activation Rules
@@ -41,10 +41,10 @@ Workflows activate based on task characteristics:
 - **sprint**: When there is a focused, time-boxed objective with clear deliverables
 - **investigate**: When the root cause is unknown and systematic evidence gathering is needed
 - **tdd**: When building new functionality where correctness matters most
-- **review-cycle**: When code changes need thorough quality assessment before merge
+- **architecture-cycle**: When code changes need thorough quality assessment before merge
 - **refactor**: When improving existing code structure without changing behavior
 - **deploy-prep**: When preparing a release with verification checklists
-- **interview**: When requirements are ambiguous and need structured clarification
+- **clarification**: When requirements are ambiguous and need structured clarification
 - **team-sync**: When multiple agents must coordinate on parallel workstreams
 
 ## Team Coordination Protocol
@@ -65,7 +65,7 @@ Plan --> Execute --> Verify --> Fix (loop until green)
 
 ### Quality Gates
 
-- **Plan Gate**: Plan must be reviewed by at least one other agent before execution begins.
+- **Plan Gate**: Plan must be checked by at least one other agent before execution begins.
 - **Execute Gate**: Implementation must have corresponding tests before moving to verify.
 - **Verify Gate**: All tests pass, no regressions, no new warnings.
 - **Fix Gate**: Fixes are scoped to the failing issue -- no scope creep during fix phase.

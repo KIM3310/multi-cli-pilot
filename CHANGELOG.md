@@ -49,8 +49,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- 15 specialized agent role prompts (architect, executor, debugger, reviewer, etc.)
-- 10 built-in workflows (autopilot, deep-plan, sprint, tdd, review-cycle, etc.)
+- 15 specialized agent role prompts (architect, executor, debugger, architecture-reader, etc.)
+- 10 built-in workflows (autopilot, deep-plan, sprint, tdd, architecture-cycle, etc.)
 - Session harness with configurable approval modes (full / auto / yolo)
 - Team coordination via tmux with phase-based pipeline (Plan, Execute, Verify, Fix)
 - Hook system for extending harness behavior with lifecycle events

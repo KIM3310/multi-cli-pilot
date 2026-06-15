@@ -79,10 +79,10 @@ describe("WorkflowRegistry", () => {
     expect(names).toContain("sprint");
     expect(names).toContain("investigate");
     expect(names).toContain("tdd");
-    expect(names).toContain("review-cycle");
+    expect(names).toContain("architecture-cycle");
     expect(names).toContain("refactor");
     expect(names).toContain("deploy-prep");
-    expect(names).toContain("interview");
+    expect(names).toContain("clarification");
     expect(names).toContain("team-sync");
   });
 

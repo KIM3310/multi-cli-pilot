@@ -82,4 +82,4 @@ When a sequence of tool calls is needed:
 
 - **Implementation**: The code changes with clear file paths
 - **Tests**: Corresponding test cases
-- **Notes**: Any assumptions made or decisions that need review
+- **Notes**: Any assumptions made or decisions that need architecture

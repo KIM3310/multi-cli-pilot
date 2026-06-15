@@ -3,7 +3,7 @@
 ## Live Demo
 
 - [Open the public GitHub Pages demo](https://kim3310.github.io/multi-cli-pilot/)
-- Scope: credential-free, synthetic-data demo for reviewers and evaluators.
+- Scope: credential-free, synthetic-data demo for architecture-readers and evaluators.
 
 ![CI](https://github.com/KIM3310/multi-cli-pilot/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -25,19 +25,19 @@ workflows, prompts, hooks, MCP tools, and team primitives.
 > preserved as deprecated aliases — existing `gp` / `gemini-pilot`
 > commands continue to work.
 
-## Product and Review Surface
+## Product and System Surface
 
 A multi-agent CLI harness that shows how complex coding work can be coordinated without losing traceability.
 
 | Lens | Definition |
 |---|---|
 | Audience | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
-| Review path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
-| Architecture signal | Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface. |
-| Safety boundary | Agent output remains advisory and review-required; production repositories should keep human approval and CI gates. |
-| Fast proof | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
+| Architecture path | Validate the demo, README, architecture notes, and quality gate before deeper workflow architecture. |
+| System signal | Prompt management, workflows, coordination, task queues, and MCP support in a inspectable CLI surface. |
+| Safety boundary | Agent output remains advisory and approval-required; production repositories should keep human approval and CI gates. |
+| Fast path | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
 
-## Reviewer Fast Path
+## System Fast Path
 
 - **First minute:** Run a simple workflow, then inspect how provider switching and team coordination are represented.
 - **Local demo:** Run the installer or `npm install && npm run build`, then use the CLI examples under Quick Start.
@@ -45,11 +45,11 @@ A multi-agent CLI harness that shows how complex coding work can be coordinated 
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to review audiences, proof gates, operating boundaries, and risk controls.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to architecture audiences, operating gates, operating boundaries, and risk controls.
 
-## Review Notes
+## Architecture Notes
 
-- [Review guide](docs/reviewer-evidence-map.md) summarizes the project angle, first files to inspect, verification commands, and known boundaries.
+- [Architecture guide](docs/architecture-evidence-map.md) summarizes the project angle, first files to inspect, runtime commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
 
@@ -100,8 +100,8 @@ flowchart LR
 
 ## Features
 
-- **16 Specialized Agents** — architect, executor, debugger, reviewer, test-engineer, and more, each with a role prompt plus a tool-calling optimization prompt.
-- **10 Built-in Workflows** — autopilot, deep-plan, sprint, investigate, tdd, review-cycle, refactor, deploy-prep, interview, team-sync.
+- **16 Specialized Agents** — architect, executor, debugger, architecture-reader, test-engineer, and more, each with a role prompt plus a tool-calling optimization prompt.
+- **10 Built-in Workflows** — autopilot, deep-plan, sprint, investigate, tdd, architecture-cycle, refactor, deploy-prep, clarification, team-sync.
 - **Provider Adapter** — pick `gemini` or `qwen` via config or env. Swapping providers swaps the binary, default models, and install instructions.
 - **Team Coordination** — phase-based pipeline (Plan → Execute → Verify → Fix) with quality gates and shared state.
 - **Session Metrics** — prompts sent, estimated tokens, latency samples, wall-clock elapsed — persisted to session state.
@@ -255,7 +255,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the reviewer, trust boundary, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the architecture-reader, trust boundary, trust boundary, operating checks, and service path for this repository.
 
 ## System Architecture
 

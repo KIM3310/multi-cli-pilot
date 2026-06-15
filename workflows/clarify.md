@@ -1,17 +1,17 @@
 ---
-name: interview
+name: clarification
 description: Socratic requirements clarification through structured questioning
 triggers:
   - "clarify requirements"
   - "what exactly do you need"
-  - "interview mode"
+  - "clarification mode"
 execution_policy:
   max_iterations: 6
   auto_approve: false
   halt_on_failure: false
 ---
 
-# Interview Workflow
+# Clarification Workflow
 
 Structured questioning to elicit clear, complete requirements from ambiguous requests.
 

@@ -27,7 +27,7 @@ Thorough planning with multiple perspectives and consensus building.
 - **agent**: scientist
 - **action**: Investigate technical options and precedents
 - **output**: research findings with comparisons
-- **gate**: Key technical questions answered
+- **gate**: Key architecture questions answered
 
 ### 3. Architecture
 - **agent**: architect

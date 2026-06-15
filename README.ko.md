@@ -65,7 +65,7 @@ flowchart LR
 ## 주요 기능
 
 - **16개 전문 에이전트** — 아키텍트, 실행자, 디버거, 리뷰어, 테스트 엔지니어 등.
-- **10개 내장 워크플로우** — autopilot, deep-plan, sprint, investigate, tdd, review-cycle, refactor, deploy-prep, interview, team-sync.
+- **10개 내장 워크플로우** — autopilot, deep-plan, sprint, investigate, tdd, architecture-cycle, refactor, deploy-prep, clarification, team-sync.
 - **Provider 어댑터** — config나 환경변수로 `gemini` / `qwen` 전환. 바이너리·기본 모델·설치 안내가 자동으로 교체됩니다.
 - **팀 협업 런타임** — Plan → Execute → Verify → Fix 파이프라인과 품질 게이트.
 - **세션 메트릭** — 프롬프트 수, 예상 토큰, 지연 샘플, 벽시계 경과를 세션 상태에 영속화.

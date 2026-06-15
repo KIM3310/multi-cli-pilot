@@ -41,15 +41,15 @@ Fully autonomous development cycle: plan, implement, test, and verify.
 - **output**: test files and execution results
 - **gate**: All tests pass
 
-### 5. Review
-- **agent**: reviewer
-- **action**: Review implementation for quality issues
-- **output**: review report with findings
+### 5. Architecture
+- **agent**: architecture-reader
+- **action**: Architecture implementation for quality issues
+- **output**: architecture report with findings
 - **gate**: No blocking issues remain
 
 ### 6. Fix
 - **agent**: executor
-- **action**: Address any issues from review
+- **action**: Address any issues from architecture
 - **output**: updated source files
 - **gate**: All tests still pass after fixes
 - **loop_to**: 4 (if issues found, max 3 iterations)

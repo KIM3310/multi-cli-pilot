@@ -74,7 +74,7 @@ describe("Prompts Directory Loading", () => {
     expect(names).toContain("planner");
     expect(names).toContain("executor");
     expect(names).toContain("debugger");
-    expect(names).toContain("reviewer");
+    expect(names).toContain("architecture-reader");
     expect(names).toContain("security-auditor");
     expect(names).toContain("test-engineer");
     expect(names).toContain("optimizer");
