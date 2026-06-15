@@ -33,7 +33,7 @@ A multi-agent CLI harness that shows how complex coding work can be coordinated 
 |---|---|
 | Audience | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
 | Review path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
-| Review signal | Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface. |
+| Architecture signal | Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface. |
 | Safety boundary | Agent output remains advisory and review-required; production repositories should keep human approval and CI gates. |
 | Fast proof | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
 
@@ -256,6 +256,10 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 ## Enterprise Productization
 
 - [Product operating model](docs/product-operating-model.md) defines the reviewer, trust boundary, trust boundary, operating checks, and service path for this repository.
+
+## System Architecture
+
+- [System architecture](docs/system-architecture.md) maps the runtime boundary, data/control flow, cloud or local deployment surface, and operating assumptions for this repository.
 
 ## Service Architecture
 
