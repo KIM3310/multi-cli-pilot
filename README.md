@@ -272,7 +272,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 - Public entry: free CLI recipes and demo tasks
 - Paid boundary: team workflow library, hosted run history, and provider cost dashboard
 - Canonical URL: https://kim3310.github.io/multi-cli-pilot/
-- Lead capture: mailto:ehdjs1351@gmail.com?subject=Multi-CLI%20Pilot%20private%20workspace&body=I%20am%20interested%20in%20team%20workflow%20library%2C%20hosted%20run%20history%2C%20and%20provider%20cost%20dashboard%20for%20Multi-CLI%20Pilot.
+- Lead capture: https://github.com/KIM3310/multi-cli-pilot/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Multi-CLI+Pilot
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
 - Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)
