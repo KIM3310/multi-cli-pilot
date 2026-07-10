@@ -2,7 +2,7 @@
 
 Updated: 2026-05-30
 
-Use this page as the short path through the repository. It keeps the architecture grounded in the code, docs, commands, and boundaries that are already present.
+Use this page as the short path through the repository. It keeps the review grounded in the code, docs, commands, and boundaries that are already present.
 
 ## Summary
 
@@ -16,9 +16,9 @@ Use this page as the short path through the repository. It keeps the architectur
 ## Open First
 
 1. Start with the README fast path and architecture section.
-2. Open `docs/service-launch-playbook.md` only when architectureing the product or service angle.
+2. Open `docs/service-launch-playbook.md` only when reviewing the product or service angle.
 3. Check the commands below before making claims about quality.
-4. Skim the CI workflows and fixture data before deeper implementation architecture.
+4. Skim the CI workflows and fixture data before deeper implementation review.
 5. Read the boundaries section before presenting the project externally.
 
 ## Checks
@@ -35,7 +35,7 @@ Use this page as the short path through the repository. It keeps the architectur
 
 - .github/workflows/architecture-blueprint.yml
 - .github/workflows/ci.yml
-- .github/workflows/dependency-architecture.yml
+- .github/workflows/dependency-review.yml
 - .github/workflows/repository-health.yml
 - .github/workflows/repository-surface.yml
 - .github/workflows/secret-scan.yml
@@ -45,24 +45,24 @@ Use this page as the short path through the repository. It keeps the architectur
 - package scripts and web/runtime checks
 - npm run verify passes
 - Installers work
-- Workflow examples are inspectable
+- Workflow examples are reviewable
 
 ## Architecture Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Internal workflow setup | Scope after product intake |
-| Team-agent playbook | Scope after product intake |
-| MCP orchestration starter | Scope after product intake |
+| Internal workflow setup | Scope after stakeholder intake |
+| Team-agent playbook | Scope after stakeholder intake |
+| MCP orchestration starter | Scope after stakeholder intake |
 
 ## Boundaries
 
-- Human architecture remains required
+- Human review remains required
 - Secrets stay local
 - Generated code needs CI gates
 
 ## Useful Metrics
 
 - Workflow completion
-- Architecture cycle time
+- Review cycle time
 - Failed-agent recovery rate

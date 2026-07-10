@@ -67,7 +67,7 @@ execution_policy:
 ---
 
 ### 1. Lint
-- **agent**: architecture
+- **agent**: architecture-reader
 - **action**: Run the project linter and fix any issues
 - **output**: Clean lint output
 - **gate**: exit-code:0
@@ -131,7 +131,7 @@ execution_policy:
 ---
 
 ### 1. Format
-- **agent**: architecture
+- **agent**: architecture-reader
 - **action**: Run black and isort to format all Python files
 - **output**: All files formatted
 - **gate**: exit-code:0
@@ -196,7 +196,7 @@ execution_policy:
 - **gate**: contains:pass
 
 ### 2. Frontend Lint
-- **agent**: architecture
+- **agent**: architecture-reader
 - **action**: Lint frontend code (ESLint, Prettier)
 - **output**: Clean lint output
 - **gate**: exit-code:0

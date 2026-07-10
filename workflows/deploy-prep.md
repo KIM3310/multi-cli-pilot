@@ -41,8 +41,8 @@ Systematic pre-deployment verification to ensure release readiness.
 - **output**: documentation checklist
 - **gate**: All public changes documented
 
-### 5. Final Architecture
+### 5. Final Review
 - **agent**: architect
-- **action**: Holistic architecture of release readiness
+- **action**: Holistic review of release readiness
 - **output**: go/no-go recommendation with rationale
 - **gate**: Architect approves release

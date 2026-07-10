@@ -2,7 +2,7 @@
 # Gemini Pilot Installer for Linux
 # Usage: chmod +x Install-Linux.sh && ./Install-Linux.sh
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit 1
 
 # ── Timing ───────────────────────────────────────────────
 SECONDS=0
@@ -46,6 +46,7 @@ echo ""
 # ── Detect platform ──────────────────────────────────────
 ARCH="$(uname -m)"
 if [ -f /etc/os-release ]; then
+  # shellcheck disable=SC1091
   . /etc/os-release
   DISTRO_INFO="${PRETTY_NAME:-${NAME:-Linux}} (${ARCH})"
 else
@@ -65,7 +66,9 @@ if command -v curl &>/dev/null; then
 else
   info "Installing curl..."
   if command -v apt-get &>/dev/null; then
-    $SUDO apt-get update -qq && $SUDO apt-get install -y curl || die "Failed to install curl."
+    if ! $SUDO apt-get update -qq || ! $SUDO apt-get install -y curl; then
+      die "Failed to install curl."
+    fi
   elif command -v dnf &>/dev/null; then
     $SUDO dnf install -y curl || die "Failed to install curl."
   elif command -v yum &>/dev/null; then
@@ -269,7 +272,7 @@ echo ""
 if [ "$ERRORS" -eq 0 ]; then
   echo "  ╔══════════════════════════════════════════╗"
   echo "  ║                                          ║"
-  printf "  ║   ${GREEN}Installation Complete!${RESET}                ║\n"
+  printf '  ║   %sInstallation Complete!%s                ║\n' "$GREEN" "$RESET"
   echo "  ║                                          ║"
   echo "  ║   Open a terminal and try:               ║"
   echo "  ║                                          ║"
@@ -282,7 +285,7 @@ if [ "$ERRORS" -eq 0 ]; then
   echo "  ╚══════════════════════════════════════════╝"
 else
   echo "  ╔══════════════════════════════════════════╗"
-  printf "  ║   ${YELLOW}Installation finished with ${ERRORS} warning(s)${RESET}  ║\n"
+  printf '  ║   %sInstallation finished with %s warning(s)%s  ║\n' "$YELLOW" "$ERRORS" "$RESET"
   echo "  ║   Review the messages above.             ║"
   echo "  ╚══════════════════════════════════════════╝"
 fi

@@ -3,7 +3,7 @@
 ## Live Demo
 
 - [Open the public GitHub Pages demo](https://kim3310.github.io/multi-cli-pilot/)
-- Scope: credential-free, synthetic-data demo for architecture-readers and evaluators.
+- Scope: credential-free, synthetic-data demo for reviewers and evaluators.
 
 ![CI](https://github.com/KIM3310/multi-cli-pilot/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -25,31 +25,31 @@ workflows, prompts, hooks, MCP tools, and team primitives.
 > preserved as deprecated aliases — existing `gp` / `gemini-pilot`
 > commands continue to work.
 
-## Product and System Surface
+## System Overview
 
 A multi-agent CLI harness that shows how complex coding work can be coordinated without losing traceability.
 
-| Lens | Definition |
+| Area | Details |
 |---|---|
-| Audience | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
-| Architecture path | Validate the demo, README, architecture notes, and quality gate before deeper workflow architecture. |
-| System signal | Prompt management, workflows, coordination, task queues, and MCP support in a inspectable CLI surface. |
-| Safety boundary | Agent output remains advisory and approval-required; production repositories should keep human approval and CI gates. |
-| Fast path | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
+| Users | Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development. |
+| Technical path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
+| System scope | Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface. |
+| Operating boundary | Agent output remains advisory and approval-required; production repositories should keep human approval and CI gates. |
+| Evaluation path | Run the local test/build scripts and inspect the workflow examples and coordination docs. |
 
-## System Fast Path
+## Evaluation Path
 
-- **First minute:** Run a simple workflow, then inspect how provider switching and team coordination are represented.
+- **Start here:** Run a simple workflow, then inspect how provider switching and team coordination are represented.
 - **Local demo:** Run the installer or `npm install && npm run build`, then use the CLI examples under Quick Start.
-- **Verification:** Run `npm run verify`; it covers lint, typecheck, tests, and build.
+- **Checks:** Run `npm run verify`; it covers lint, typecheck, tests, and build.
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to architecture audiences, operating gates, operating boundaries, and risk controls.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to its product scope, operating gates, operating boundaries, and risk controls.
 
 ## Architecture Notes
 
-- [Architecture guide](docs/architecture-evidence-map.md) summarizes the project angle, first files to inspect, runtime commands, and known boundaries.
+- [Architecture guide](docs/architecture-evidence-map.md) summarizes the system scope, first files to inspect, runtime commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
 
@@ -247,15 +247,13 @@ MIT — see [LICENSE](LICENSE).
 
 ## Cloud + AI Architecture
 
-This repository includes a neutral cloud and AI engineering blueprint that maps the current proof surface to runtime boundaries, data contracts, model-risk controls, deployment posture, and validation hooks.
-
 - [Cloud + AI architecture blueprint](docs/cloud-ai-architecture.md)
 - [Machine-readable architecture manifest](docs/architecture/blueprint.json)
 - Validation command: `python3 scripts/validate_architecture_blueprint.py`
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the architecture-reader, trust boundary, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the product scope, trust boundary, operating checks, and service path for this repository.
 
 ## System Architecture
 
