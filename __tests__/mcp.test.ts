@@ -1,7 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
-import * as path from "node:path";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import * as os from "node:os";
+import * as path from "node:path";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createMcpServer } from "../src/mcp/server.js";
 
 /**
@@ -187,5 +190,39 @@ describe("MCP Server Tools", () => {
       value: "{}",
     });
     expect(result).toContain("Cannot write to");
+  });
+});
+
+describe("MCP HTTP transport compatibility", () => {
+  it("adapts Node HTTP requests with the patched Hono server", async () => {
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined,
+    });
+    const httpServer = createServer((request, response) => {
+      void transport.handleRequest(request, response);
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      httpServer.once("error", reject);
+      httpServer.listen(0, "127.0.0.1", resolve);
+    });
+
+    try {
+      const address = httpServer.address() as AddressInfo;
+      const response = await fetch(`http://127.0.0.1:${address.port}/mcp`, {
+        method: "PUT",
+      });
+
+      expect(response.status).toBe(405);
+      expect(response.headers.get("allow")).toBe("GET, POST, DELETE");
+      await expect(response.json()).resolves.toMatchObject({
+        error: { message: "Method not allowed." },
+      });
+    } finally {
+      await transport.close();
+      await new Promise<void>((resolve, reject) => {
+        httpServer.close((error) => (error ? reject(error) : resolve()));
+      });
+    }
   });
 });
