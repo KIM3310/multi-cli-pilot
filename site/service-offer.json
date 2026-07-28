@@ -5,7 +5,7 @@
   "repository_url": "https://github.com/KIM3310/multi-cli-pilot",
   "architecture_url": "https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/system-architecture.md",
   "revenue_architecture_url": "https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/revenue-architecture.md",
-  "lead_capture_url": "https://github.com/KIM3310/multi-cli-pilot/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Multi-CLI+Pilot",
+  "lead_capture_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&inquiry=agent-reliability-audit#private-inquiry",
   "productized_offer": "multi-CLI orchestration runner with reproducible task routes and provider abstraction",
   "first_paid_sku": "team workflow library, hosted run history, and provider cost dashboard",
   "free_lead_magnet": "free CLI recipes and demo tasks",
@@ -64,7 +64,7 @@
         "@type": "Offer",
         "name": "team workflow library, hosted run history, and provider cost dashboard",
         "availability": "https://schema.org/LimitedAvailability",
-        "url": "https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/revenue-architecture.md"
+        "url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&inquiry=agent-reliability-audit#private-inquiry"
       }
     ],
     "isAccessibleForFree": true,
@@ -72,20 +72,20 @@
   },
   "commerce": {
     "gateway_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers",
-    "lane_id": "stagepilot-reliability-lab",
-    "lane_name": "StagePilot Reliability Lab",
+    "lane_id": "agent-reliability-audit",
+    "lane_name": "Agent Reliability Audit",
     "billing_mode": "one-time",
-    "price_unit": "reliability report pack from USD 500",
-    "fulfillment_kind": "private scenario suite, trace review, retry and parser findings, and provider scorecard",
+    "price_unit": "fixed audit from USD 1,500",
+    "fulfillment_kind": "private scenario suite, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan",
     "risk_bucket": "standard-b2b",
     "checkout": {
-      "provider": "lemon-squeezy",
-      "status": "account-onboarding-required",
-      "fallback_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers"
+      "provider": null,
+      "status": "not-configured",
+      "fallback_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&inquiry=agent-reliability-audit#private-inquiry"
     },
     "sponsorship": {
       "provider": "github-sponsors",
-      "eligible": true,
+      "eligible": false,
       "status": "sponsors-listing-not-configured"
     },
     "advertising": {

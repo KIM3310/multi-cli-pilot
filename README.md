@@ -130,10 +130,15 @@ cd multi-cli-pilot
 chmod +x Install-Linux.sh && ./Install-Linux.sh
 ```
 
-### npm
+### Source Install
 ```bash
-npm install -g multi-cli-pilot
+npm install
+npm run build
+npm link
 ```
+
+The npm registry package is not published. The repository is marked private
+until package ownership, release signing, and support policy are in place.
 
 ### Requirements
 
@@ -224,7 +229,8 @@ multi-cli-pilot/
 
 ## Backward Compatibility
 
-- The published binary names `gp` and `gemini-pilot` continue to work.
+- The legacy binary aliases `gp` and `gemini-pilot` continue to work in the
+  source distribution.
 - Existing imports of `GeminiPilotConfig` / `GeminiPilotConfigSchema`
   are retained as deprecated type aliases pointing at the new
   `MultiCliPilotConfig` / `MultiCliPilotConfigSchema` names.
@@ -270,7 +276,7 @@ MIT — see [LICENSE](LICENSE).
 - Public entry: free CLI recipes and demo tasks
 - Paid boundary: team workflow library, hosted run history, and provider cost dashboard
 - Canonical URL: https://kim3310.github.io/multi-cli-pilot/
-- Lead capture: https://github.com/KIM3310/multi-cli-pilot/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Multi-CLI+Pilot
+- Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&inquiry=agent-reliability-audit#private-inquiry
 - Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)

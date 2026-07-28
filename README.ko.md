@@ -94,10 +94,16 @@ cd multi-cli-pilot
 chmod +x Install-Linux.sh && ./Install-Linux.sh
 ```
 
-### npm
+### 소스 설치
 ```bash
-npm install -g multi-cli-pilot
+npm install
+npm run build
+npm link
 ```
+
+npm 레지스트리 패키지는 아직 배포하지 않았습니다. 패키지 소유권,
+릴리스 서명, 지원 정책을 갖추기 전까지 이 저장소는 private package로
+유지합니다.
 
 ### 요구 사항
 

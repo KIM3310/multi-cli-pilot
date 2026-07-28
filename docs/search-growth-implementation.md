@@ -10,7 +10,7 @@ This repository now exposes a search-readable service surface in addition to the
 | Revenue architecture | [docs/revenue-architecture.md](./revenue-architecture.md) |
 | System architecture | [docs/system-architecture.md](./system-architecture.md) |
 | Public canonical URL | https://kim3310.github.io/multi-cli-pilot/ |
-| Lead capture URL | https://github.com/KIM3310/multi-cli-pilot/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Multi-CLI+Pilot |
+| Lead capture URL | https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&inquiry=agent-reliability-audit#private-inquiry |
 | Commercial route | https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers |
 
 ## Search Positioning
@@ -28,5 +28,5 @@ The public surface stays crawlable and free. Paid value starts when a visitor wa
 
 - Keep the sitemap and robots file aligned with the final production domain.
 - Submit the canonical URL and sitemap in Google Search Console after the domain is connected.
-- The lead-capture path is a GitHub Issue Form so private workspace and paid-package requests create a trackable queue before payment infrastructure is added.
+- The lead-capture path is the central private inquiry route using `offer=multi-cli-pilot` and `inquiry=agent-reliability-audit`; preserve that lane ID when updating CTAs.
 - Keep exact free-tier quotas out of public promises because provider limits change.
