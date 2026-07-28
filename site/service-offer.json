@@ -1,7 +1,7 @@
 {
   "name": "Multi-CLI Pilot",
   "slug": "multi-cli-pilot",
-  "canonical_url": "https://kim3310.github.io/multi-cli-pilot/",
+  "canonical_url": "https://multi-cli-pilot.pages.dev/",
   "repository_url": "https://github.com/KIM3310/multi-cli-pilot",
   "architecture_url": "https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/system-architecture.md",
   "revenue_architecture_url": "https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/revenue-architecture.md",
@@ -43,7 +43,7 @@
     "name": "Multi-CLI Pilot",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Web, serverless, and local development environments",
-    "url": "https://kim3310.github.io/multi-cli-pilot/",
+    "url": "https://multi-cli-pilot.pages.dev/",
     "codeRepository": "https://github.com/KIM3310/multi-cli-pilot",
     "description": "Multi-CLI Pilot: multi-CLI orchestration runner with reproducible task routes and provider abstraction. Free entry point: free CLI recipes and demo tasks. Paid path: team workflow library, hosted run history, and.",
     "creator": {
@@ -58,7 +58,7 @@
         "price": "0",
         "priceCurrency": "USD",
         "availability": "https://schema.org/InStock",
-        "url": "https://kim3310.github.io/multi-cli-pilot/"
+        "url": "https://multi-cli-pilot.pages.dev/"
       },
       {
         "@type": "Offer",

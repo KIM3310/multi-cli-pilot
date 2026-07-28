@@ -8,7 +8,7 @@ Free multi-CLI reliability worksheet for comparing tool adapters and terminal wo
 
 - Audience: developer-tool builders and agent runtime teams
 - Central resource: https://kim3310-doeon-kim-portfolio.pages.dev/resources/multi-cli-pilot/
-- Live system: https://kim3310.github.io/multi-cli-pilot/
+- Live system: https://multi-cli-pilot.pages.dev/
 - Advertising boundary: ads allowed only on public CLI reliability resources; command traces, terminal logs, and diagnostics are ad-free
 - Current ad state: code-ready on the central resource; serving depends on Google AdSense site approval and consent policy.
 

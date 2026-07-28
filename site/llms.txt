@@ -3,7 +3,7 @@
 Purpose: multi-CLI orchestration runner with reproducible task routes and provider abstraction
 Free entry point: free CLI recipes and demo tasks
 Paid boundary: team workflow library, hosted run history, and provider cost dashboard
-Canonical URL: https://kim3310.github.io/multi-cli-pilot/
+Canonical URL: https://multi-cli-pilot.pages.dev/
 Repository: https://github.com/KIM3310/multi-cli-pilot
 System architecture: https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/system-architecture.md
 Revenue architecture: https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/revenue-architecture.md

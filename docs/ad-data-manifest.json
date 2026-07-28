@@ -6,7 +6,7 @@
   "audience": "developer-tool builders and agent runtime teams",
   "public_resource": {
     "url": "https://kim3310-doeon-kim-portfolio.pages.dev/resources/multi-cli-pilot/",
-    "live_demo": "https://kim3310.github.io/multi-cli-pilot/",
+    "live_demo": "https://multi-cli-pilot.pages.dev/",
     "readiness_checklist": [
       "Architecture Summary",
       "Runtime And Data Flow",

@@ -2,7 +2,7 @@
 
 ## Live Demo
 
-- [Open the public GitHub Pages demo](https://kim3310.github.io/multi-cli-pilot/)
+- [Open the public GitHub Pages demo](https://multi-cli-pilot.pages.dev/)
 - Scope: credential-free, synthetic-data demo for reviewers and evaluators.
 
 ![CI](https://github.com/KIM3310/multi-cli-pilot/actions/workflows/ci.yml/badge.svg)
@@ -275,7 +275,7 @@ MIT — see [LICENSE](LICENSE).
 
 - Public entry: free CLI recipes and demo tasks
 - Paid boundary: team workflow library, hosted run history, and provider cost dashboard
-- Canonical URL: https://kim3310.github.io/multi-cli-pilot/
+- Canonical URL: https://multi-cli-pilot.pages.dev/
 - Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&inquiry=agent-reliability-audit#private-inquiry
 - Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/multi-cli-pilot/
 - Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers

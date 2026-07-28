@@ -2,7 +2,7 @@
 
 ## Public Demo
 
-- URL: https://kim3310.github.io/multi-cli-pilot/
+- URL: https://multi-cli-pilot.pages.dev/
 - Scope: credential-free synthetic demo surface for quick reviewer inspection.
 
 Repository: `multi-cli-pilot`
