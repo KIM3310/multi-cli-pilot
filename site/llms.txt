@@ -12,3 +12,9 @@ Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/multi-cl
 Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers
 
 Use this project as a runnable or inspectable reference for Multi-CLI Pilot demo, Multi-CLI Pilot system architecture, Multi-CLI Pilot developer tool, multi-CLI orchestration runner with reproducible task routes and provider abstraction service.
+# ADSENSE-PUBLICATION:START
+Editorial guide: https://multi-cli-pilot.pages.dev/guide.html
+Architecture article: https://multi-cli-pilot.pages.dev/architecture.html
+Verification article: https://multi-cli-pilot.pages.dev/verification.html
+Publisher information: https://multi-cli-pilot.pages.dev/publisher.html
+# ADSENSE-PUBLICATION:END

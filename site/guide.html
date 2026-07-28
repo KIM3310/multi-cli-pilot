@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Guide | Multi-CLI Pilot</title>
+  <meta name="description" content="Free multi-CLI reliability worksheet for comparing tool adapters and terminal workflows. Source-backed guide for developer-tool builders and agent runtime…">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="google-adsense-account" content="ca-pub-4973160293737562">
+  <link rel="canonical" href="https://multi-cli-pilot.pages.dev/guide.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Project Guide | Multi-CLI Pilot">
+  <meta property="og:description" content="Free multi-CLI reliability worksheet for comparing tool adapters and terminal workflows. Source-backed guide for developer-tool builders and agent runtime teams.">
+  <meta property="og:url" content="https://multi-cli-pilot.pages.dev/guide.html">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Project Guide | Multi-CLI Pilot","description":"Free multi-CLI reliability worksheet for comparing tool adapters and terminal workflows. Source-backed guide for developer-tool builders and agent runtime teams.","url":"https://multi-cli-pilot.pages.dev/guide.html","dateModified":"2026-07-28","author":{"@type":"Person","name":"KIM3310","url":"https://github.com/KIM3310"},"publisher":{"@type":"Person","name":"KIM3310","url":"https://kim3310-doeon-kim-portfolio.pages.dev"},"isAccessibleForFree":true}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4973160293737562" crossorigin="anonymous"></script>
+  <style>
+    :root { color-scheme: light; --ink: #17201f; --muted: #52605d; --line: #cbd2ce; --paper: #ffffff; --ground: #f5f6f4; --green: #126455; --coral: #c94732; --gold: #b67a00; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ground); color: var(--ink); font: 17px/1.72 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: var(--green); text-underline-offset: 3px; }
+    .site-header { border-bottom: 1px solid var(--line); background: rgba(245, 246, 244, .97); }
+    .site-nav, .article-shell, .site-footer-inner { width: min(920px, calc(100% - 32px)); margin: 0 auto; }
+    .site-nav { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .site-nav strong { font-size: .92rem; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: .84rem; }
+    .article-shell { padding: 54px 0 72px; }
+    .breadcrumbs { color: var(--muted); font-size: .82rem; }
+    .article-intro { padding: 28px 0 36px; border-bottom: 2px solid var(--ink); }
+    .kicker { color: var(--coral); font-size: .76rem; font-weight: 800; text-transform: uppercase; }
+    h1 { margin: 10px 0 16px; max-width: 18ch; font-size: 3.5rem; line-height: 1.04; letter-spacing: 0; overflow-wrap: anywhere; }
+    .lede { max-width: 68ch; color: var(--muted); font-size: 1.08rem; }
+    .review-note { margin-top: 18px; color: var(--muted); font-size: .84rem; }
+    article { padding-top: 24px; }
+    article h2 { margin: 42px 0 12px; padding-top: 6px; font-size: 1.75rem; line-height: 1.2; letter-spacing: 0; }
+    article h3 { margin: 30px 0 8px; font-size: 1.2rem; letter-spacing: 0; }
+    article h4 { margin: 24px 0 6px; font-size: 1.02rem; letter-spacing: 0; }
+    article p, article li { max-width: 76ch; }
+    article li + li { margin-top: 6px; }
+    pre { max-width: 100%; overflow: auto; border-left: 4px solid var(--gold); background: #1d2423; color: #f6f8f7; padding: 18px; border-radius: 4px; font-size: .86rem; }
+    code { overflow-wrap: anywhere; }
+    :not(pre) > code { border: 1px solid var(--line); background: var(--paper); padding: 1px 5px; border-radius: 3px; font-size: .9em; }
+    .table-scroll { overflow-x: auto; margin: 20px 0; }
+    table { width: 100%; border-collapse: collapse; background: var(--paper); font-size: .9rem; }
+    th, td { border: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #e9eeeb; }
+    .boundary-note { margin: 30px 0 4px; border-left: 4px solid var(--coral); background: var(--paper); padding: 18px; }
+    .source-basis { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 22px; color: var(--muted); }
+    .site-footer { border-top: 1px solid var(--line); background: var(--paper); }
+    .site-footer-inner { padding: 28px 0 44px; color: var(--muted); font-size: .84rem; }
+    .site-footer-links { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+    @media (max-width: 720px) {
+      .site-nav { align-items: flex-start; flex-direction: column; padding: 14px 0; }
+      .article-shell { padding-top: 32px; }
+      h1 { font-size: 2.35rem; }
+    }
+  </style>
+</head>
+<body data-ad-surface="editorial">
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Primary">
+      <strong>Multi-CLI Pilot</strong>
+      <div class="nav-links"><a href="/">Home</a><a href="/guide.html">Project guide</a><a href="/architecture.html">Architecture</a><a href="/verification.html">Verification</a><a href="/publisher.html">Publisher</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></div>
+    </nav>
+  </header>
+  <main class="article-shell">
+    <p class="breadcrumbs"><a href="/">Home</a> / Project guide</p>
+    <header class="article-intro">
+      <div class="kicker">Project guide</div>
+      <h1>Project Guide | Multi-CLI Pilot</h1>
+      <p class="lede">Free multi-CLI reliability worksheet for comparing tool adapters and terminal workflows. This guide organizes the repository&#039;s original implementation notes for developer-tool builders and agent runtime teams.</p>
+      <p class="review-note">Reviewed 2026-07-28. This page is derived from checked-in repository evidence and links back to its source.</p>
+    </header>
+
+    <article><h3>Live Demo</h3>
+<ul><li><a href="https://multi-cli-pilot.pages.dev/" rel="noopener">Open the public GitHub Pages demo</a></li><li>Scope: credential-free, synthetic-data demo for reviewers and evaluators.</li></ul>
+<h2>Multi-CLI Pilot</h2>
+<p><strong>One orchestration harness, multiple coding-agent CLIs.</strong> Drive <a href="https://github.com/google-gemini/gemini-cli" rel="noopener">Gemini CLI</a> or <a href="https://github.com/QwenLM/qwen-code" rel="noopener">Qwen CLI</a> from the same agents, workflows, prompts, hooks, MCP tools, and team primitives.</p>
+<p>Multi-CLI Pilot is the successor to <code>gemini-pilot</code> and <code>qwen-pilot</code>. Both repos have been consolidated here and the Gemini-only APIs are preserved as deprecated aliases — existing <code>gp</code> / <code>gemini-pilot</code> commands continue to work.</p>
+<h3>System Overview</h3>
+<p>A multi-agent CLI harness that shows how complex coding work can be coordinated without losing traceability.</p>
+<div class="table-scroll"><table><thead><tr><th>Area</th><th>Details</th></tr></thead><tbody><tr><td>Users</td><td>Engineering teams, automation leads, and internal platform groups experimenting with agent-assisted development.</td></tr><tr><td>Technical path</td><td>Validate the demo, README, architecture notes, and quality gate before deeper workflow review.</td></tr><tr><td>System scope</td><td>Prompt management, workflows, coordination, task queues, and MCP support in a reviewable CLI surface.</td></tr><tr><td>Operating boundary</td><td>Agent output remains advisory and approval-required; production repositories should keep human approval and CI gates.</td></tr><tr><td>Evaluation path</td><td>Run the local test/build scripts and inspect the workflow examples and coordination docs.</td></tr></tbody></table></div>
+<h3>Evaluation Path</h3>
+<ul><li><strong>Start here:</strong> Run a simple workflow, then inspect how provider switching and team coordination are represented.</li><li><strong>Local demo:</strong> Run the installer or <code>npm install &amp;&amp; npm run build</code>, then use the CLI examples under Quick Start.</li><li><strong>Checks:</strong> Run <code>npm run verify</code>; it covers lint, typecheck, tests, and build.</li></ul>
+<h3>Architecture Notes</h3>
+<ul><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/architecture-evidence-map.md" rel="noopener">Architecture guide</a> summarizes the system scope, first files to inspect, runtime commands, and known boundaries.</li><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/quality-gate.md" rel="noopener">Quality notes</a> lists the local checks, CI surface, and release expectations for this repository.</li><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/enterprise-readiness.md" rel="noopener">Enterprise readiness notes</a> outlines security, data, operations, integration, and handoff expectations.</li></ul>
+<h3>Why</h3>
+<p>Coding-agent CLIs ship fast but each one ends up with its own agents, workflows, and tmux scripts. Multi-CLI Pilot abstracts the CLI behind a <strong>provider adapter</strong> so the harness, HUD, MCP server, and tool- reliability pipeline stay the same regardless of which CLI you target.</p>
+<h3>Architecture</h3>
+<pre><code>flowchart LR
+  subgraph UX[&quot;UX&quot;]
+    CLI[mcp / gp]
+    HUD[HUD display]
+  end
+
+  subgraph Core[&quot;Multi-CLI Pilot Core&quot;]
+    Config[Config + Env&lt;br/&gt;provider, models, approval]
+    Agents[16 Agents + Registry]
+    Workflows[10 Workflows]
+    Hooks[Hook Manager]
+    Team[Team Coordinator&lt;br/&gt;plan/execute/verify/fix]
+    Harness[Harness&lt;br/&gt;session + metrics + state]
+    MCP[MCP Server&lt;br/&gt;tools exported]
+    ToolRel[Tool-Call Reliability&lt;br/&gt;parser + middleware]
+  end
+
+  subgraph Providers[&quot;Provider Adapters&quot;]
+    Gemini[Gemini CLI&lt;br/&gt;gemini]
+    Qwen[Qwen CLI&lt;br/&gt;qwen]
+  end
+
+  CLI --&gt; Config
+  CLI --&gt; Workflows
+  CLI --&gt; Agents
+  Config --&gt; Harness
+  Harness --&gt; Providers
+  Workflows --&gt; Harness
+  Team --&gt; Harness
+  Hooks --&gt; Harness
+  MCP --&gt; Harness
+  HUD --&gt; Harness
+  ToolRel --&gt; Harness</code></pre>
+<h3>Features</h3>
+<ul><li><strong>16 Specialized Agents</strong> — architect, executor, debugger, architecture-reader, test-engineer, and more, each with a role prompt plus a tool-calling optimization prompt.</li><li><strong>10 Built-in Workflows</strong> — autopilot, deep-plan, sprint, investigate, tdd, architecture-cycle, refactor, deploy-prep, clarification, team-sync.</li><li><strong>Provider Adapter</strong> — pick <code>gemini</code> or <code>qwen</code> via config or env. Swapping providers swaps the binary, default models, and install instructions.</li><li><strong>Team Coordination</strong> — phase-based pipeline (Plan → Execute → Verify → Fix) with quality gates and shared state.</li><li><strong>Session Metrics</strong> — prompts sent, estimated tokens, latency samples, wall-clock elapsed — persisted to session state.</li><li><strong>Tool-Call Reliability</strong> — parser and middleware for hardening tool-call output across providers.</li><li><strong>Hook System</strong> — event-driven hooks for extending harness behavior (session-start, session-end, error, …).</li><li><strong>MCP Server</strong> — Model Context Protocol integration so the harness can be driven from any MCP-aware client.</li><li><strong>HUD Dashboard</strong> — real-time metrics display with tmux integration.</li><li><strong>State Persistence</strong> — JSON state, memory, and notepad stored in <code>.gemini-pilot/</code> (directory name kept for backward compatibility).</li></ul>
+<h4>macOS</h4>
+<ol><li>Download or clone this repo</li><li>Double-click <code>Install-Mac.command</code></li><li>Open Terminal and type <code>mcp --help</code> (or the legacy <code>gp --help</code>)</li></ol>
+<h4>Windows</h4>
+<ol><li>Download or clone this repo</li><li>Double-click <code>Install-Windows.bat</code></li><li>Open CMD and type <code>mcp --help</code></li></ol>
+<h4>Linux</h4>
+<pre><code>git clone https://github.com/KIM3310/multi-cli-pilot.git
+cd multi-cli-pilot
+chmod +x Install-Linux.sh &amp;&amp; ./Install-Linux.sh</code></pre>
+<h4>Source Install</h4>
+<pre><code>npm install
+npm run build
+npm link</code></pre>
+<p>The npm registry package is not published. The repository is marked private until package ownership, release signing, and support policy are in place.</p>
+<h4>Requirements</h4>
+<ul><li>Node.js ≥ 20.0.0</li><li>One of the supported coding-agent CLIs on <code>$PATH</code>:</li><li><strong>Gemini</strong> — <code>npm install -g @google/gemini-cli</code> (default, <code>gemini-3.1-pro</code> family)</li><li><strong>Qwen</strong> — <code>npm install -g @qwen-code/qwen-code</code> (<code>qwen3-coder-plus</code> family)</li></ul>
+<h3>Quick Start</h3>
+<pre><code>
+## Run with the default provider (Gemini)
+mcp
+
+
+## Switch to Qwen for the current session
+MCP_PROVIDER=qwen mcp
+
+
+## Legacy aliases still work
+gp
+gemini-pilot</code></pre>
+<h3>Provider Selection</h3>
+<p>The provider is resolved from the first matching source:</p>
+<ol><li><code>MCP_PROVIDER</code> (or the legacy <code>GP_PROVIDER</code>) environment variable</li><li><code>provider</code> field in <code>.gemini-pilot/config.json</code> (project)</li><li><code>provider</code> field in <code>~/.config/gemini-pilot/config.json</code> (user)</li><li>Built-in default (<code>gemini</code>)</li></ol>
+<p>Example project config:</p>
+<pre><code>{
+  &quot;provider&quot;: &quot;qwen&quot;,
+  &quot;session&quot;: { &quot;approvalMode&quot;: &quot;auto&quot;, &quot;defaultTier&quot;: &quot;balanced&quot; }
+}</code></pre>
+<p>When <code>provider</code> is set to <code>qwen</code> and <code>models.*</code> entries have not been overridden, the loader substitutes Qwen tier defaults (<code>qwen3-coder-plus</code> / <code>qwen3-coder</code> / <code>qwen3-coder-flash</code>) automatically.</p>
+<h3>Project Structure</h3>
+<pre><code>multi-cli-pilot/
+  AGENTS.md           # Master orchestration contract
+  prompts/            # 16 agent role prompts (markdown)
+  workflows/          # 10 workflow definitions (markdown with frontmatter)
+  src/
+    agents/           # Agent registry
+    benchmark/        # Benchmark runner
+    cli/              # CLI entry point
+    config/           # Config loader, schema, provider resolution
+    errors/           # Error codes
+    harness/          # Session harness (provider-aware)
+    hooks/            # Event hook manager
+    hud/              # HUD renderer
+    init/             # `mcp init` templates
+    mcp/              # MCP server integration
+    metrics/          # Runtime session metrics tracker
+    plugins/          # Prompt/workflow plugin loader
+    prompts/          # Prompt file loader
+    providers/        # Provider adapter layer (Gemini, Qwen)
+    state/            # State manager and schema
+    team/             # Team coordinator (plan/execute/verify/fix)
+    tool-bench/       # Tool-calling benchmark harness
+    tool-reliability/ # Tool-call parser + middleware
+    utils/            # fs, logger, small helpers
+    workflows/        # Workflow runner
+  __tests__/          # Vitest test suite (225 tests)</code></pre>
+<h3>Commands</h3>
+<div class="table-scroll"><table><thead><tr><th>Command</th><th>Description</th></tr></thead><tbody><tr><td><code>mcp init</code></td><td>Scaffold <code>.gemini-pilot/</code> with config, memory, workflows</td></tr><tr><td><code>mcp</code></td><td>Launch an interactive session with the active provider</td></tr><tr><td><code>mcp config show</code></td><td>Print the resolved configuration</td></tr><tr><td><code>mcp workflows list</code></td><td>List available workflows</td></tr><tr><td><code>mcp workflows run &lt;name&gt;</code></td><td>Execute a workflow end-to-end</td></tr><tr><td><code>mcp agents list</code></td><td>List registered agents</td></tr><tr><td><code>mcp team</code></td><td>Start a tmux-based multi-agent team</td></tr></tbody></table></div>
+<h3>Backward Compatibility</h3>
+<p>  source distribution.</p>
+<p>  are retained as deprecated type aliases pointing at the new   <code>MultiCliPilotConfig</code> / <code>MultiCliPilotConfigSchema</code> names.</p>
+<p>  don&#039;t need to migrate anything.</p>
+<ul><li>The legacy binary aliases <code>gp</code> and <code>gemini-pilot</code> continue to work in the</li><li>Existing imports of <code>GeminiPilotConfig</code> / <code>GeminiPilotConfigSchema</code></li><li>The state directory is still <code>.gemini-pilot/</code> so existing projects</li></ul>
+<h3>Development</h3>
+<pre><code>npm install
+npm run typecheck      # strict TypeScript
+npm test               # 225 tests across config, harness, team, MCP, …
+npm run lint           # biome
+npm run build          # emit to dist/</code></pre>
+<h3>Cloud + AI Architecture</h3>
+<ul><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/cloud-ai-architecture.md" rel="noopener">Cloud + AI architecture blueprint</a></li><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/architecture/blueprint.json" rel="noopener">Machine-readable architecture manifest</a></li><li>Validation command: <code>python3 scripts/validate_architecture_blueprint.py</code></li></ul>
+<h3>Enterprise Productization</h3>
+<ul><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/product-operating-model.md" rel="noopener">Product operating model</a> defines the product scope, trust boundary, operating checks, and service path for this repository.</li></ul>
+<h3>System Architecture</h3>
+<ul><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/system-architecture.md" rel="noopener">System architecture</a> maps the runtime boundary, data/control flow, cloud or local deployment surface, and operating assumptions for this repository.</li></ul>
+<h3>Service Architecture</h3>
+<ul><li><a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/service-architecture.md" rel="noopener">Service architecture</a> defines the cloud resources, account information, cost controls, and production guardrails needed to turn this repo into a scoped service without publishing public financial assumptions.</li></ul>
+<h3>Search And Service Surface</h3>
+<ul><li>Public entry: free CLI recipes and demo tasks</li><li>Paid boundary: team workflow library, hosted run history, and provider cost dashboard</li><li>Canonical URL: https://multi-cli-pilot.pages.dev/</li><li>Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot&amp;inquiry=agent-reliability-audit#private-inquiry</li><li>Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/multi-cli-pilot/</li><li>Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=multi-cli-pilot#service-offers</li><li>Machine-readable offer: <a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/service-offer.json" rel="noopener">docs/service-offer.json</a></li><li>Search growth implementation: <a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/search-growth-implementation.md" rel="noopener">docs/search-growth-implementation.md</a></li><li>Revenue architecture: <a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/docs/revenue-architecture.md" rel="noopener">docs/revenue-architecture.md</a></li></ul></article>
+    <aside class="source-basis">
+      <strong>Source basis:</strong> <a href="https://github.com/KIM3310/multi-cli-pilot/blob/main/README.md" rel="noopener">README.md</a>. Corrections can be proposed through the public repository without submitting private data.
+    </aside>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-links"><a href="/">Home</a><a href="/guide.html">Project guide</a><a href="/architecture.html">Architecture</a><a href="/verification.html">Verification</a><a href="/publisher.html">Publisher</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="https://kim3310-doeon-kim-portfolio.pages.dev/">Resource atlas</a></div>
+      <p>Advertising may appear on this public editorial page after Google approves the site. Ads are not placed inside private, transactional, diagnostic, security-response, or operational workflows.</p>
+    </div>
+  </footer>
+</body>
+</html>
